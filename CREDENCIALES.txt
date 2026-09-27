@@ -1,0 +1,26 @@
+CREDENCIALES DE ACCESO - SISTEMA MAR-Z
+======================================
+
+1. Rol: Solicitante
+   - Correo: solicitante@marz.com
+   - Contrasena: password123
+   - Nombre: Carlos Solicitante
+   - Permisos: Crear solicitudes, consultar mis solicitudes, confirmar solucion.
+
+2. Rol: Coordinador
+   - Correo: coordinador@marz.com
+   - Contrasena: password123
+   - Nombre: Ana Coordinadora
+   - Permisos: Priorizar solicitudes, asignar solicitudes, indicadores, exportar reporte.
+
+3. Rol: Agente
+   - Correo: agente@marz.com
+   - Contrasena: password123
+   - Nombre: Mario Agente
+   - Permisos: Bandeja de atencion, registrar comentarios, cambiar estado.
+
+4. Rol: Auditor
+   - Correo: auditor@marz.com
+   - Contrasena: password123
+   - Nombre: Elena Auditora
+   - Permisos: Historial de auditoria (solo lectura).

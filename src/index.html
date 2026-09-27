@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAR-Z</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Vista de Inicio de Sesion -->
+  <div id="login-view" class="auth-wrapper">
+    <div class="auth-header">
+      <h1>Iniciar sesion en MAR-Z</h1>
+    </div>
+
+    <div class="auth-card">
+      <div id="login-error" class="alert-error" role="alert"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Correo electronico</label>
+          <input type="email" id="email" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contrasena</label>
+          <input type="password" id="password" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Iniciar sesion</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Vista de Panel Principal por Rol -->
+  <div id="dashboard-view" style="display: none;">
+    <header class="app-header">
+      <div>
+        <span class="brand-text">MAR-Z</span>
+      </div>
+      <div class="user-nav">
+        <span id="user-display-name" class="user-name"></span>
+        <span id="user-display-role" class="role-badge"></span>
+        <button id="logout-btn" class="btn btn-default btn-sm">Cerrar sesion</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- Seccion de Informacion del Usuario y Modulos -->
+      <div class="box">
+        <div class="box-header">
+          <h2>Panel de control</h2>
+        </div>
+        <div class="box-body">
+          <p style="margin-bottom: 8px;"><strong>Usuario:</strong> <span id="welcome-name"></span></p>
+          <p style="color: var(--color-fg-muted); margin-bottom: 16px;" id="role-description"></p>
+
+          <h3 style="font-size: 13px; text-transform: uppercase; color: var(--color-fg-muted); margin-bottom: 12px; letter-spacing: 0.5px;">Funciones permitidas para este rol</h3>
+          <div id="modules-container" class="modules-list"></div>
+        </div>
+      </div>
+
+      <!-- Seccion HU02: Formulario de Creacion de Solicitud (Visible para Solicitantes) -->
+      <div id="solicitud-crear-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU02 — Crear solicitud de soporte</h2>
+        </div>
+        <div class="box-body">
+          <div id="solicitud-error" class="alert-error" role="alert"></div>
+          <div id="solicitud-success" class="alert-success" role="alert"></div>
+
+          <form id="solicitud-form">
+            <div class="form-group">
+              <label for="solicitud-categoria">Categoria *</label>
+              <select id="solicitud-categoria" required>
+                <option value="">-- Seleccione una categoria --</option>
+                <option value="Software">Software</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Redes y Comunicaciones">Redes y Comunicaciones</option>
+                <option value="Accesos y Cuentas">Accesos y Cuentas</option>
+                <option value="Soporte General">Soporte General</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="solicitud-titulo">Titulo *</label>
+              <input type="text" id="solicitud-titulo" placeholder="Resumen breve del problema" required>
+            </div>
+
+            <div class="form-group">
+              <label for="solicitud-descripcion">Descripcion *</label>
+              <textarea id="solicitud-descripcion" placeholder="Detalle la solicitud de soporte requerida..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Registrar solicitud</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Seccion HU03: Consultar mis solicitudes (Visible para Solicitantes) -->
+      <div id="solicitud-listar-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU03 — Mis solicitudes</h2>
+        </div>
+        <div class="box-body">
+          <table class="table-simple" id="solicitudes-tabla">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Categoria</th>
+                <th>Titulo</th>
+                <th>Estado</th>
+                <th>Ultima actualizacion</th>
+                <th style="text-align: right;">Accion</th>
+              </tr>
+            </thead>
+            <tbody id="solicitudes-tbody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--color-fg-muted);">No hay solicitudes registradas aun.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Vista de Detalle de Solicitud (HU03) -->
+      <div id="solicitud-detalle-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2 id="detalle-titulo-header">Detalle de solicitud</h2>
+          <button id="cerrar-detalle-btn" class="btn btn-default btn-sm">Cerrar detalle</button>
+        </div>
+        <div class="box-body">
+          <div class="detail-grid">
+            <div class="detail-label">ID Solicitud:</div>
+            <div class="detail-value" id="det-id"></div>
+
+            <div class="detail-label">Estado:</div>
+            <div class="detail-value" id="det-estado"></div>
+
+            <div class="detail-label">Categoria:</div>
+            <div class="detail-value" id="det-categoria"></div>
+
+            <div class="detail-label">Titulo:</div>
+            <div class="detail-value" id="det-titulo"></div>
+
+            <div class="detail-label">Descripcion:</div>
+            <div class="detail-value" id="det-descripcion" style="white-space: pre-wrap; background: var(--color-canvas-subtle); padding: 8px 12px; border-radius: 4px; border: 1px solid var(--color-border-muted);"></div>
+
+            <div class="detail-label">Fecha creacion:</div>
+            <div class="detail-value" id="det-fecha"></div>
+
+            <div class="detail-label">Ultima actualizacion:</div>
+            <div class="detail-value" id="det-actualizacion"></div>
+
+            <div class="detail-label">Propietario:</div>
+            <div class="detail-value" id="det-propietario"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="notice-box">
+        Acceso restringido: las funciones mostradas corresponden exclusivamente a los permisos asignados a su rol.
+      </div>
+    </main>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="requests.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

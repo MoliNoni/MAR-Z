@@ -1,0 +1,337 @@
+:root {
+  --color-canvas-default: #ffffff;
+  --color-canvas-subtle: #f6f8fa;
+  --color-border-default: #d0d7de;
+  --color-border-muted: #d8dee4;
+  --color-fg-default: #1f2328;
+  --color-fg-muted: #656d76;
+  --color-accent-fg: #0969da;
+  --color-btn-primary-bg: #1f883d;
+  --color-btn-primary-hover-bg: #1a7f37;
+  --color-btn-primary-text: #ffffff;
+  --color-btn-default-bg: #f6f8fa;
+  --color-btn-default-hover-bg: #f3f4f6;
+  --color-btn-default-border: #d0d7de;
+  --color-danger-fg: #cf222e;
+  --color-danger-subtle: #ffebe9;
+  --color-danger-border: #ff8182;
+  --color-success-fg: #1a7f37;
+  --color-success-subtle: #dafbe1;
+  --color-success-border: #4ac26b;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  background-color: var(--color-canvas-subtle);
+  color: var(--color-fg-default);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* GitHub Style Header */
+.app-header {
+  background-color: #24292f;
+  color: #ffffff;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.user-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+/* Badge */
+.role-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  border-radius: 12px;
+  background-color: #ffffff26;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-transform: capitalize;
+}
+
+/* Containers */
+.auth-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 85vh;
+  padding: 24px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.auth-header h1 {
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 340px;
+  background-color: var(--color-canvas-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"],
+select,
+textarea {
+  width: 100%;
+  padding: 5px 12px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-fg-default);
+  background-color: var(--color-canvas-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  box-shadow: inset 0 1px 0 rgba(208, 215, 222, 0.2);
+  font-family: inherit;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-accent-fg);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 5px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid rgba(31, 35, 40, 0.15);
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-primary {
+  color: var(--color-btn-primary-text);
+  background-color: var(--color-btn-primary-bg);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-btn-primary-hover-bg);
+}
+
+.btn-default {
+  color: var(--color-fg-default);
+  background-color: var(--color-btn-default-bg);
+  border-color: var(--color-btn-default-border);
+  box-shadow: 0 1px 0 rgba(27, 31, 36, 0.04);
+}
+
+.btn-default:hover {
+  background-color: var(--color-btn-default-hover-bg);
+}
+
+.btn-sm {
+  padding: 3px 10px;
+  font-size: 12px;
+  line-height: 18px;
+  width: auto;
+}
+
+/* Alerts */
+.alert-error {
+  background-color: var(--color-danger-subtle);
+  border: 1px solid var(--color-danger-border);
+  color: var(--color-danger-fg);
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.alert-success {
+  background-color: var(--color-success-subtle);
+  border: 1px solid var(--color-success-border);
+  color: var(--color-success-fg);
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+/* Box / Cards (GitHub style Box) */
+.box {
+  background-color: var(--color-canvas-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  margin-bottom: 24px;
+}
+
+.box-header {
+  padding: 16px;
+  background-color: var(--color-canvas-subtle);
+  border-bottom: 1px solid var(--color-border-default);
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.box-header h2,
+.box-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.box-body {
+  padding: 16px;
+}
+
+.modules-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.module-item {
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  padding: 16px;
+  background-color: var(--color-canvas-default);
+}
+
+.module-item h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent-fg);
+  margin-bottom: 4px;
+}
+
+.module-item p {
+  font-size: 12px;
+  color: var(--color-fg-muted);
+}
+
+/* Table GitHub Style */
+.table-simple {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.table-simple th,
+.table-simple td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-default);
+  font-size: 13px;
+}
+
+.table-simple th {
+  background-color: var(--color-canvas-subtle);
+  font-weight: 600;
+  color: var(--color-fg-default);
+}
+
+.tag-nuevo {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  background-color: #ddf4ff;
+  color: #0969da;
+  border: 1px solid #54aeff66;
+}
+
+/* Detail Box (HU03) */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px 16px;
+  font-size: 13px;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--color-fg-muted);
+}
+
+.detail-value {
+  color: var(--color-fg-default);
+}
+
+.notice-box {
+  background-color: var(--color-canvas-subtle);
+  border: 1px solid var(--color-border-muted);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--color-fg-muted);
+}
