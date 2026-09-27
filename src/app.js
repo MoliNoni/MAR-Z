@@ -1,6 +1,7 @@
 /**
  * Controlador de Aplicacion para Frontend - MAR-Z
  * Soporta HU01 (Login/Roles), HU02 (Crear solicitudes) y HU03 (Consultar mis solicitudes y detalle)
+ * Integrado con Supabase
  */
 
 const MODULE_CATALOG = {
@@ -51,7 +52,6 @@ const MODULE_CATALOG = {
 };
 
 const SESSION_STORAGE_KEY = 'marz_current_user';
-const REQUESTS_STORAGE_KEY = 'marz_solicitudes_db';
 
 // Elementos DOM Autenticacion
 const loginView = document.getElementById('login-view');
@@ -111,14 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Manejo de Login (HU01)
-loginForm.addEventListener('submit', (e) => {
+loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loginError.style.display = 'none';
 
   const email = emailInput.value.trim();
   const password = passwordInput.value;
 
-  const result = authenticate(email, password);
+  const result = await authenticate(email, password);
 
   if (result.success) {
     currentUser = result.user;
@@ -196,7 +196,7 @@ function showDashboard(user) {
 }
 
 // Manejo de Creacion de Solicitud (HU02)
-solicitudForm.addEventListener('submit', (e) => {
+solicitudForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   solicitudError.style.display = 'none';
   solicitudSuccess.style.display = 'none';
@@ -213,14 +213,13 @@ solicitudForm.addEventListener('submit', (e) => {
     descripcion: solicitudDescripcion.value
   };
 
-  const resultado = crearSolicitud(datos, currentUser);
+  const resultado = await crearSolicitud(datos, currentUser);
 
   if (resultado.success) {
-    guardarEnLocalStorage(resultado.solicitud);
     solicitudForm.reset();
     solicitudSuccess.textContent = `Solicitud ${resultado.solicitud.id} creada exitosamente con estado "${resultado.solicitud.estado}".`;
     solicitudSuccess.style.display = 'block';
-    renderMisSolicitudesTabla();
+    await renderMisSolicitudesTabla();
   } else {
     solicitudError.textContent = resultado.error;
     solicitudError.style.display = 'block';
@@ -232,32 +231,11 @@ cerrarDetalleBtn.addEventListener('click', () => {
   solicitudDetalleSection.style.display = 'none';
 });
 
-// Guardar en almacenamiento local
-function guardarEnLocalStorage(solicitud) {
-  try {
-    const list = JSON.parse(localStorage.getItem(REQUESTS_STORAGE_KEY) || '[]');
-    list.push(solicitud);
-    localStorage.setItem(REQUESTS_STORAGE_KEY, JSON.stringify(list));
-  } catch (err) {
-    console.error('Error al guardar en storage', err);
-  }
-}
-
-// Obtener todas las solicitudes del storage
-function obtenerTodasDeLocalStorage() {
-  try {
-    return JSON.parse(localStorage.getItem(REQUESTS_STORAGE_KEY) || '[]');
-  } catch {
-    return [];
-  }
-}
-
 // HU03: Renderizar tabla de solicitudes propias del usuario
-function renderMisSolicitudesTabla() {
+async function renderMisSolicitudesTabla() {
   if (!currentUser) return;
 
-  const todas = obtenerTodasDeLocalStorage();
-  const resultado = consultarMisSolicitudes(currentUser, todas);
+  const resultado = await consultarMisSolicitudes(currentUser);
   const misSolicitudes = resultado.solicitudes || [];
 
   if (misSolicitudes.length === 0) {
@@ -287,11 +265,10 @@ function renderMisSolicitudesTabla() {
 }
 
 // HU03: Mostrar detalle de solicitud seleccionada
-window.verDetalle = function(solicitudId) {
+window.verDetalle = async function(solicitudId) {
   if (!currentUser) return;
 
-  const todas = obtenerTodasDeLocalStorage();
-  const resultado = obtenerDetalleSolicitud(solicitudId, currentUser, todas);
+  const resultado = await obtenerDetalleSolicitud(solicitudId, currentUser);
 
   if (!resultado.success) {
     alert(resultado.error);
