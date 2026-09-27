@@ -4,6 +4,7 @@
   "description": "Proyecto MAR-Z - Sistema de Gestión de Solicitudes",
   "main": "server.js",
   "scripts": {
+    "build": "echo Ready",
     "start": "node server.js",
     "test": "node --test tests/*.test.js",
     "test:supabase": "node tests/test_supabase_live.js"
