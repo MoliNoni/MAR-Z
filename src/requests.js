@@ -5,19 +5,19 @@
  * Persistencia directa en base de datos Supabase
  */
 
-let supabase = null;
+let requestsDbClient = null;
 if (typeof window !== 'undefined' && window.supabaseClient) {
-  supabase = window.supabaseClient;
+  requestsDbClient = window.supabaseClient;
 } else if (typeof require !== 'undefined') {
   const clientModule = require('./supabaseClient.js');
-  supabase = clientModule.supabaseClient;
+  requestsDbClient = clientModule.supabaseClient;
 }
 
 function getClient() {
   if (typeof window !== 'undefined' && window.supabaseClient) {
     return window.supabaseClient;
   }
-  return supabase;
+  return requestsDbClient;
 }
 
 const CATEGORIAS_VALIDAS = [
