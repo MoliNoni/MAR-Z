@@ -1,6 +1,6 @@
 /**
  * Controlador de Aplicacion para Frontend - MAR-Z
- * Soporta HU01 (Login/Roles), HU02 (Crear solicitudes) y HU03 (Consultar mis solicitudes y detalle)
+ * Soporta HU01 (Login/Roles), HU02 (Crear solicitudes), HU03 (Consultar mis solicitudes y detalle) y HU04 (Priorizar)
  * Integrado con Supabase
  */
 
@@ -91,6 +91,11 @@ const detDescripcion = document.getElementById('det-descripcion');
 const detFecha = document.getElementById('det-fecha');
 const detActualizacion = document.getElementById('det-actualizacion');
 const detPropietario = document.getElementById('det-propietario');
+
+// Elementos DOM Priorizacion (HU04)
+const priorizarSection = document.getElementById('priorizar-section');
+const priorizarTbody = document.getElementById('priorizar-tbody');
+const priorizarError = document.getElementById('priorizar-error');
 
 let currentUser = null;
 
@@ -190,6 +195,14 @@ function showDashboard(user) {
     solicitudListarSection.style.display = 'none';
   }
 
+  // Mostrar seccion HU04 (Priorizar solicitudes) si tiene permiso
+  if (hasPermission(user.role, 'priorizar_solicitudes')) {
+    priorizarSection.style.display = 'block';
+    renderPriorizarTabla();
+  } else {
+    priorizarSection.style.display = 'none';
+  }
+
   if (solicitudDetalleSection) {
     solicitudDetalleSection.style.display = 'none';
   }
@@ -287,4 +300,63 @@ window.verDetalle = async function(solicitudId) {
 
   solicitudDetalleSection.style.display = 'block';
   solicitudDetalleSection.scrollIntoView({ behavior: 'smooth' });
+};
+
+// HU04: Renderizar tabla de solicitudes ordenadas para priorizar
+async function renderPriorizarTabla() {
+  if (!currentUser) return;
+  priorizarError.style.display = 'none';
+
+  const resultado = await consultarSolicitudesParaPriorizar(currentUser);
+
+  if (!resultado.success) {
+    priorizarError.textContent = resultado.error;
+    priorizarError.style.display = 'block';
+    return;
+  }
+
+  if (resultado.solicitudes.length === 0) {
+    priorizarTbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; color: var(--color-fg-muted);">No hay solicitudes registradas aun.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  priorizarTbody.innerHTML = resultado.solicitudes.map(s => {
+    const opciones = ['<option value="">Sin prioridad</option>']
+      .concat(PRIORIDADES.map(p => `<option value="${p}" ${p === s.prioridad ? 'selected' : ''}>${p}</option>`))
+      .join('');
+    const ultimoCambio = s.prioridadActualizadaEn
+      ? `${s.prioridadActualizadaPor} - ${new Date(s.prioridadActualizadaEn).toLocaleString()}`
+      : '-';
+    return `
+      <tr>
+        <td><strong>${s.id}</strong></td>
+        <td>${s.titulo}</td>
+        <td><span class="tag-nuevo">${s.estado}</span></td>
+        <td>${new Date(s.fecha).toLocaleString()}</td>
+        <td>${ultimoCambio}</td>
+        <td style="text-align: right;">
+          <select onchange="actualizarPrioridad('${s.id}', this.value)">${opciones}</select>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// HU04: Cambiar prioridad desde la tabla
+window.actualizarPrioridad = async function(solicitudId, prioridad) {
+  if (!currentUser) return;
+
+  const resultado = await cambiarPrioridad(solicitudId, prioridad, currentUser);
+
+  if (!resultado.success) {
+    priorizarError.textContent = resultado.error;
+    priorizarError.style.display = 'block';
+    return;
+  }
+
+  await renderPriorizarTabla();
 };

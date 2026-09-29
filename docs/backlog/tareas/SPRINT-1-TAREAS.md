@@ -33,12 +33,12 @@ Responsable: Dev 3
 ## HU04 — Priorizar solicitudes
 Responsable: Dev 4
 
-- [ ] Definir niveles de prioridad.
-- [ ] Implementar cambio de prioridad.
-- [ ] Registrar quién y cuándo realizó el cambio.
-- [ ] Crear ordenamiento por prioridad, estado y fecha.
-- [ ] Restringir el cambio al coordinador.
-- [ ] Probar permisos y trazabilidad.
+- [x] Definir niveles de prioridad.
+- [x] Implementar cambio de prioridad.
+- [x] Registrar quién y cuándo realizó el cambio.
+- [x] Crear ordenamiento por prioridad, estado y fecha.
+- [x] Restringir el cambio al coordinador.
+- [x] Probar permisos y trazabilidad.
 
 ## Trabajo conjunto
 
