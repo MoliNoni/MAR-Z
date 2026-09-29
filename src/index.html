@@ -139,7 +139,7 @@
                 <th>Estado</th>
                 <th>Fecha</th>
                 <th>Ultimo cambio de prioridad</th>
-                <th style="text-align: right;">Prioridad</th>
+                <th style="text-align: right;">Prioridad (Alta: justificacion y fecha objetivo)</th>
               </tr>
             </thead>
             <tbody id="priorizar-tbody"></tbody>
@@ -179,6 +179,18 @@
             <div class="detail-label">Propietario:</div>
             <div class="detail-value" id="det-propietario"></div>
           </div>
+
+          <!-- HU08: Confirmar o reabrir solucion (solo solicitudes Resueltas del solicitante) -->
+          <div id="solucion-error" class="alert-error" role="alert" style="margin-top: 16px;"></div>
+          <div id="solucion-success" class="alert-success" role="alert" style="margin-top: 16px;"></div>
+          <div id="solucion-acciones" style="display: none; margin-top: 16px;">
+            <div class="form-group">
+              <label for="solucion-motivo">Motivo de reapertura</label>
+              <textarea id="solucion-motivo" placeholder="Indique por que la solucion no resolvio el problema..."></textarea>
+            </div>
+            <button id="confirmar-solucion-btn" class="btn btn-primary">Confirmar solucion</button>
+            <button id="reabrir-solicitud-btn" class="btn btn-default">Reabrir solicitud</button>
+          </div>
         </div>
       </div>
 
@@ -193,6 +205,7 @@
   <script src="supabaseClient.js"></script>
   <script src="auth.js"></script>
   <script src="requests.js"></script>
+  <script src="solucion.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

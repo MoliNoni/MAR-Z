@@ -43,6 +43,7 @@ Objetivo: poder asignar, atender y cerrar solicitudes de forma trazable.
   - Solo permitir transiciones válidas.
   - Guardar todo el historial.
   - Rechazar cambios de estado inválidos.
+  - Usar el historial compartido `historial_solicitudes` (creado en HU08).
 
 - HU08 — Confirmar o reabrir solución — 5 pts — Dev 4
   - El solicitante puede aceptar una solicitud Resuelta.

@@ -1,6 +1,6 @@
 /**
  * Controlador de Aplicacion para Frontend - MAR-Z
- * Soporta HU01 (Login/Roles), HU02 (Crear solicitudes), HU03 (Consultar mis solicitudes y detalle) y HU04 (Priorizar)
+ * Soporta HU01 (Login/Roles), HU02 (Crear solicitudes), HU03 (Consultar mis solicitudes y detalle), HU04 (Priorizar) y HU08 (Confirmar o reabrir solucion)
  * Integrado con Supabase
  */
 
@@ -297,6 +297,7 @@ window.verDetalle = async function(solicitudId) {
   detFecha.textContent = new Date(s.fecha).toLocaleString();
   detActualizacion.textContent = new Date(s.ultimaActualizacion || s.fecha).toLocaleString();
   detPropietario.textContent = `${s.propietario.nombre} (${s.propietario.email})`;
+  mostrarAccionesSolucion(s);
 
   solicitudDetalleSection.style.display = 'block';
   solicitudDetalleSection.scrollIntoView({ behavior: 'smooth' });
@@ -331,26 +332,44 @@ async function renderPriorizarTabla() {
     const ultimoCambio = s.prioridadActualizadaEn
       ? `${s.prioridadActualizadaPor} - ${new Date(s.prioridadActualizadaEn).toLocaleString()}`
       : '-';
+    // Cambio Sprint 2: justificacion y fecha objetivo, obligatorias solo para Alta
     return `
       <tr>
         <td><strong>${s.id}</strong></td>
-        <td>${s.titulo}</td>
+        <td>${escaparHtml(s.titulo)}</td>
         <td><span class="tag-nuevo">${s.estado}</span></td>
         <td>${new Date(s.fecha).toLocaleString()}</td>
         <td>${ultimoCambio}</td>
         <td style="text-align: right;">
-          <select onchange="actualizarPrioridad('${s.id}', this.value)">${opciones}</select>
+          <select id="prioridad-${s.id}">${opciones}</select>
+          <input type="text" id="justificacion-${s.id}" placeholder="Justificacion (Alta)" value="${escaparHtml(s.prioridadJustificacion || '')}">
+          <input type="date" id="fecha-objetivo-${s.id}" value="${s.prioridadFechaObjetivo || ''}">
+          <button class="btn btn-default btn-sm" onclick="actualizarPrioridad('${s.id}')">Guardar</button>
         </td>
       </tr>
     `;
   }).join('');
 }
 
-// HU04: Cambiar prioridad desde la tabla
-window.actualizarPrioridad = async function(solicitudId, prioridad) {
-  if (!currentUser) return;
+// Evita inyectar HTML con texto libre escrito por usuarios
+function escaparHtml(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto;
+  return div.innerHTML.replace(/"/g, '&quot;');
+}
 
-  const resultado = await cambiarPrioridad(solicitudId, prioridad, currentUser);
+// HU04: Cambiar prioridad desde la tabla (con justificacion y fecha objetivo si es Alta)
+window.actualizarPrioridad = async function(solicitudId) {
+  if (!currentUser) return;
+  priorizarError.style.display = 'none';
+
+  const prioridad = document.getElementById(`prioridad-${solicitudId}`).value;
+  const detalle = {
+    justificacion: document.getElementById(`justificacion-${solicitudId}`).value,
+    fechaObjetivo: document.getElementById(`fecha-objetivo-${solicitudId}`).value
+  };
+
+  const resultado = await cambiarPrioridad(solicitudId, prioridad, currentUser, detalle);
 
   if (!resultado.success) {
     priorizarError.textContent = resultado.error;
@@ -360,3 +379,58 @@ window.actualizarPrioridad = async function(solicitudId, prioridad) {
 
   await renderPriorizarTabla();
 };
+
+// Elementos DOM Confirmar o reabrir solucion (HU08)
+const solucionAcciones = document.getElementById('solucion-acciones');
+const solucionError = document.getElementById('solucion-error');
+const solucionSuccess = document.getElementById('solucion-success');
+const solucionMotivo = document.getElementById('solucion-motivo');
+const confirmarSolucionBtn = document.getElementById('confirmar-solucion-btn');
+const reabrirSolicitudBtn = document.getElementById('reabrir-solicitud-btn');
+
+let solicitudEnDetalleId = null;
+
+// HU08: Mostrar acciones solo para solicitudes Resueltas del solicitante
+function mostrarAccionesSolucion(solicitud) {
+  solicitudEnDetalleId = solicitud.id;
+  solucionError.style.display = 'none';
+  solucionSuccess.style.display = 'none';
+  solucionMotivo.value = '';
+
+  const puedeActuar = hasPermission(currentUser.role, 'confirmar_solucion') && solicitud.estado === ESTADOS.RESUELTO;
+  solucionAcciones.style.display = puedeActuar ? 'block' : 'none';
+}
+
+// HU08: Ejecuta la accion y refresca detalle y listado
+async function ejecutarAccionSolucion(accion) {
+  if (!currentUser || !solicitudEnDetalleId) return;
+  solucionError.style.display = 'none';
+  solucionSuccess.style.display = 'none';
+  confirmarSolucionBtn.disabled = true;
+  reabrirSolicitudBtn.disabled = true;
+
+  const solicitudId = solicitudEnDetalleId;
+  const resultado = await accion(solicitudId);
+
+  confirmarSolucionBtn.disabled = false;
+  reabrirSolicitudBtn.disabled = false;
+
+  if (!resultado.success) {
+    solucionError.textContent = resultado.error;
+    solucionError.style.display = 'block';
+    return;
+  }
+
+  await renderMisSolicitudesTabla();
+  await window.verDetalle(solicitudId);
+  solucionSuccess.textContent = `Solicitud ${solicitudId} actualizada a "${resultado.solicitud.estado}".`;
+  solucionSuccess.style.display = 'block';
+}
+
+confirmarSolucionBtn.addEventListener('click', () => {
+  ejecutarAccionSolucion(id => confirmarSolucion(id, currentUser));
+});
+
+reabrirSolicitudBtn.addEventListener('click', () => {
+  ejecutarAccionSolucion(id => reabrirSolicitud(id, solucionMotivo.value, currentUser));
+});

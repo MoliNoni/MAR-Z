@@ -42,9 +42,9 @@ Responsable: Dev 4
 
 ## Trabajo conjunto
 
-- [ ] Integrar las cuatro historias.
-- [ ] Ejecutar pruebas de regresión del Sprint 1.
-- [ ] Revisar criterios de aceptación.
-- [ ] Revisar Definition of Done.
-- [ ] Registrar problemas y retrabajo.
-- [ ] Preparar evidencia de R y E2.
+- [x] Integrar las cuatro historias.
+- [x] Ejecutar pruebas de regresión del Sprint 1.
+- [x] Revisar criterios de aceptación.
+- [x] Revisar Definition of Done.
+- [x] Registrar problemas y retrabajo.
+- [x] Preparar evidencia de R y E2.

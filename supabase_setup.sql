@@ -1,5 +1,6 @@
 -- MAR-Z: Script de configuracion para Supabase
 -- Sprint 1: HU01 (Login y roles), HU02 (Crear solicitudes), HU03 (Mis solicitudes), HU04 (Priorizar)
+-- Sprint 2: cambio controlado de prioridad Alta (HU04) y historial de solicitudes (HU08, compartido con HU07)
 --
 -- Instrucciones:
 -- 1. Ve a tu panel de Supabase: https://supabase.com/dashboard/project/wioavzcdnrecmkqoxwqd
@@ -34,6 +35,10 @@ alter table public.solicitudes add column if not exists prioridad text;
 alter table public.solicitudes add column if not exists prioridad_actualizada_por text;
 alter table public.solicitudes add column if not exists prioridad_actualizada_en timestamptz;
 
+-- 2.2 Cambio controlado Sprint 2: la prioridad Alta exige justificacion y fecha objetivo (HU04)
+alter table public.solicitudes add column if not exists prioridad_justificacion text;
+alter table public.solicitudes add column if not exists prioridad_fecha_objetivo date;
+
 -- 3. Habilitar politicas de seguridad (RLS)
 alter table public.usuarios enable row level security;
 alter table public.solicitudes enable row level security;
@@ -62,3 +67,28 @@ on conflict (id) do update set
   password = excluded.password,
   nombre = excluded.nombre,
   rol = excluded.rol;
+
+-- 5. Historial de acciones sobre solicitudes (Sprint 2 - HU08: confirmar o reabrir solucion)
+create table if not exists public.historial_solicitudes (
+  id bigint generated always as identity primary key,
+  solicitud_id text not null references public.solicitudes(id) on delete cascade,
+  accion text not null,
+  estado_anterior text,
+  estado_nuevo text,
+  motivo text,
+  usuario_id text not null,
+  fecha timestamptz not null default now()
+);
+
+alter table public.historial_solicitudes enable row level security;
+
+-- El historial solo admite lectura e insercion (no se edita ni se borra)
+drop policy if exists "Leer historial de solicitudes" on public.historial_solicitudes;
+create policy "Leer historial de solicitudes"
+  on public.historial_solicitudes for select
+  using (true);
+
+drop policy if exists "Insertar historial de solicitudes" on public.historial_solicitudes;
+create policy "Insertar historial de solicitudes"
+  on public.historial_solicitudes for insert
+  with check (true);

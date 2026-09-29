@@ -51,13 +51,11 @@ Resolución: encontramos algunas mejoras que detallamos en el readme. No hubiero
 
 A partir de la reflexión se definirán acciones concretas para Sprint 2.
 
-Especialmente se revisará cualquier problema relacionado con autenticación, permisos, integración entre solicitudes y prioridades, y comunicación entre los integrantes.
+Resolución: encontramos problemas arquitectónicos en el código que implica acción, este se enfoca en la integridad de los datos, la evolución planteada es utilizar credenciales cifrados en hashes para los usuarios y su información de acceso.
 
 ## Evidencias
 
 Se conservarán en el repositorio:
 - Commits relacionados con el sprint.
-- Pruebas realizadas.
-- Cambios y correcciones.
-- Decisiones relevantes.
+- Pruebas realizadas (se encuentran en /tests)
 - Registro de R y E2.
