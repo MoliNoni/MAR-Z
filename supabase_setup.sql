@@ -1,5 +1,5 @@
 -- MAR-Z: Script de configuracion para Supabase
--- Sprint 1: HU01 (Login y roles), HU02 (Crear solicitudes), HU03 (Mis solicitudes)
+-- Sprint 1: HU01 (Login y roles), HU02 (Crear solicitudes), HU03 (Mis solicitudes), HU04 (Priorizar)
 --
 -- Instrucciones:
 -- 1. Ve a tu panel de Supabase: https://supabase.com/dashboard/project/wioavzcdnrecmkqoxwqd
@@ -28,6 +28,11 @@ create table if not exists public.solicitudes (
   propietario_nombre text not null,
   propietario_email text not null
 );
+
+-- 2.1 Campos de prioridad y trazabilidad (HU04)
+alter table public.solicitudes add column if not exists prioridad text;
+alter table public.solicitudes add column if not exists prioridad_actualizada_por text;
+alter table public.solicitudes add column if not exists prioridad_actualizada_en timestamptz;
 
 -- 3. Habilitar politicas de seguridad (RLS)
 alter table public.usuarios enable row level security;

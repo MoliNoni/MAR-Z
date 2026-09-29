@@ -4,12 +4,12 @@
  * Consulta directa a la base de datos de Supabase
  */
 
-let supabase = null;
+let authDbClient = null;
 if (typeof window !== 'undefined' && window.supabaseClient) {
-  supabase = window.supabaseClient;
+  authDbClient = window.supabaseClient;
 } else if (typeof require !== 'undefined') {
   const clientModule = require('./supabaseClient.js');
-  supabase = clientModule.supabaseClient;
+  authDbClient = clientModule.supabaseClient;
 }
 
 // Definicion de Roles del Sistema MAR-Z
@@ -58,7 +58,7 @@ async function authenticate(email, password) {
     };
   }
 
-  const client = (typeof window !== 'undefined' && window.supabaseClient) ? window.supabaseClient : supabase;
+  const client = (typeof window !== 'undefined' && window.supabaseClient) ? window.supabaseClient : authDbClient;
 
   if (!client) {
     return {

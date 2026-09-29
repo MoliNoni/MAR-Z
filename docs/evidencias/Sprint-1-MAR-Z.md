@@ -12,6 +12,8 @@ Historias:
 - HU03
 - HU04
 
+Resolución: dividimos las tareas correspondientes al primer sprint, nos dimos cuenta que algunas se solapan (hay actividades entre las divisiones de tabajo asignadas a un developer que necesitan que el anterior relice este cuello de botella). Adicionalmente, conversamos y concretamos las tecnologías a usar  
+
 ## V — Vínculo
 
 Antes de comenzar la construcción acordamos:
@@ -21,6 +23,8 @@ Antes de comenzar la construcción acordamos:
 - Mantener las decisiones importantes registradas en el repositorio.
 - Pedir ayuda cuando una tarea afecte el trabajo de otro integrante.
 
+Resolución: gracias a la fase de encuentro, logramos establecer un flujo de trabajo que permita que ninguno se quede atrás, manteniendo una comunicación durante el desarrollo del sprint 
+
 ## C — Construcción
 
 Durante el sprint se desarrollan HU01-HU04.
@@ -28,6 +32,8 @@ Durante el sprint se desarrollan HU01-HU04.
 Cada integrante trabaja principalmente en su historia asignada, manteniendo coordinación con los demás para evitar problemas de integración.
 
 La construcción debe cumplir los criterios de aceptación y la Definition of Done definida para el proyecto.
+
+Resolución: se realizó el primer sprint. Cada uno hizo su respectiva historia, y el desarrollador logró acabar la suya primero, realizó el despliegue en Vercel e integrar la base de datos en Supabase
 
 ## R — Reflexión
 
@@ -38,6 +44,8 @@ Al terminar el trabajo revisaremos:
 - Qué trabajo tuvo que repetirse.
 - Qué problemas de integración encontramos.
 - Qué criterios todavía necesitan ajustes.
+
+Resolución: encontramos algunas mejoras que detallamos en el readme. No hubieron problemas a nivel general, queda trabajo de mejora pendiente y el criterio de seguridad es el primero que debemos tocar
 
 ## E2 — Evolución
 

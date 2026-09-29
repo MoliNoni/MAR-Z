@@ -5,19 +5,19 @@
  * Persistencia directa en base de datos Supabase
  */
 
-let supabase = null;
+let requestsDbClient = null;
 if (typeof window !== 'undefined' && window.supabaseClient) {
-  supabase = window.supabaseClient;
+  requestsDbClient = window.supabaseClient;
 } else if (typeof require !== 'undefined') {
   const clientModule = require('./supabaseClient.js');
-  supabase = clientModule.supabaseClient;
+  requestsDbClient = clientModule.supabaseClient;
 }
 
 function getClient() {
   if (typeof window !== 'undefined' && window.supabaseClient) {
     return window.supabaseClient;
   }
-  return supabase;
+  return requestsDbClient;
 }
 
 const CATEGORIAS_VALIDAS = [
@@ -287,13 +287,137 @@ async function obtenerDetalleSolicitud(solicitudId, usuario) {
   }
 }
 
+// HU04: Niveles de prioridad, de mayor a menor
+const PRIORIDADES = ['Alta', 'Media', 'Baja'];
+
+/**
+ * HU04: Ordena solicitudes por prioridad, estado y fecha (mas antigua primero).
+ * Las solicitudes sin prioridad quedan al final.
+ */
+function ordenarSolicitudes(solicitudes) {
+  const ordenEstados = Object.values(ESTADOS);
+  const rango = (lista, valor) => {
+    const i = lista.indexOf(valor);
+    return i === -1 ? lista.length : i;
+  };
+
+  return [...solicitudes].sort((a, b) =>
+    rango(PRIORIDADES, a.prioridad) - rango(PRIORIDADES, b.prioridad) ||
+    rango(ordenEstados, a.estado) - rango(ordenEstados, b.estado) ||
+    new Date(a.fecha) - new Date(b.fecha)
+  );
+}
+
+function esCoordinador(usuario) {
+  return Boolean(usuario && usuario.id && usuario.role === 'coordinador');
+}
+
+/**
+ * HU04: Lista todas las solicitudes ordenadas. Solo para coordinadores.
+ */
+async function consultarSolicitudesParaPriorizar(usuario) {
+  if (!esCoordinador(usuario)) {
+    return { success: false, error: 'Solo el coordinador puede priorizar solicitudes.', solicitudes: [] };
+  }
+
+  const client = getClient();
+  if (!client) {
+    return { success: false, error: 'Error de conexion con la base de datos.', solicitudes: [] };
+  }
+
+  try {
+    const { data, error } = await client.from('solicitudes').select('*');
+
+    if (error || !Array.isArray(data)) {
+      return {
+        success: false,
+        error: error ? error.message : 'Error al consultar solicitudes.',
+        solicitudes: []
+      };
+    }
+
+    const mapeadas = data.map(s => ({
+      id: s.id,
+      titulo: s.titulo,
+      categoria: s.categoria,
+      estado: s.estado,
+      fecha: s.fecha,
+      prioridad: s.prioridad,
+      prioridadActualizadaPor: s.prioridad_actualizada_por,
+      prioridadActualizadaEn: s.prioridad_actualizada_en
+    }));
+
+    return { success: true, solicitudes: ordenarSolicitudes(mapeadas) };
+  } catch (err) {
+    return { success: false, error: err.message, solicitudes: [] };
+  }
+}
+
+/**
+ * HU04: Cambia la prioridad de una solicitud registrando quien y cuando.
+ */
+async function cambiarPrioridad(solicitudId, prioridad, usuario) {
+  if (!esCoordinador(usuario)) {
+    return { success: false, error: 'Solo el coordinador puede priorizar solicitudes.' };
+  }
+
+  if (!PRIORIDADES.includes(prioridad)) {
+    return { success: false, error: 'La prioridad seleccionada no es valida.' };
+  }
+
+  const client = getClient();
+  if (!client) {
+    return { success: false, error: 'Error de conexion con la base de datos.' };
+  }
+
+  const ahora = new Date().toISOString();
+
+  try {
+    const { data, error } = await client
+      .from('solicitudes')
+      .update({
+        prioridad,
+        prioridad_actualizada_por: usuario.id,
+        prioridad_actualizada_en: ahora,
+        ultima_actualizacion: ahora
+      })
+      .eq('id', solicitudId)
+      .select()
+      .maybeSingle();
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    if (!data) {
+      return { success: false, error: 'Solicitud no encontrada.' };
+    }
+
+    return {
+      success: true,
+      solicitud: {
+        id: data.id,
+        prioridad: data.prioridad,
+        prioridadActualizadaPor: data.prioridad_actualizada_por,
+        prioridadActualizadaEn: data.prioridad_actualizada_en
+      }
+    };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     CATEGORIAS_VALIDAS,
     ESTADOS,
+    PRIORIDADES,
     validarDatosSolicitud,
     crearSolicitud,
     consultarMisSolicitudes,
-    obtenerDetalleSolicitud
+    obtenerDetalleSolicitud,
+    ordenarSolicitudes,
+    consultarSolicitudesParaPriorizar,
+    cambiarPrioridad
   };
 }
