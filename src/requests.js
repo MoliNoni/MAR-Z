@@ -271,6 +271,10 @@ async function obtenerDetalleSolicitud(solicitudId, usuario) {
         estado: data.estado,
         fecha: data.fecha,
         ultimaActualizacion: data.ultima_actualizacion,
+        asignadoA: data.asignado_a || null,
+        asignadoNombre: data.asignado_nombre || null,
+        asignadoPor: data.asignado_por || null,
+        asignadoEn: data.asignado_en || null,
         propietario: {
           id: data.propietario_id,
           nombre: data.propietario_nombre,
@@ -346,7 +350,11 @@ async function consultarSolicitudesParaPriorizar(usuario) {
       prioridadJustificacion: s.prioridad_justificacion,
       prioridadFechaObjetivo: s.prioridad_fecha_objetivo,
       prioridadActualizadaPor: s.prioridad_actualizada_por,
-      prioridadActualizadaEn: s.prioridad_actualizada_en
+      prioridadActualizadaEn: s.prioridad_actualizada_en,
+      asignadoA: s.asignado_a || null,
+      asignadoNombre: s.asignado_nombre || null,
+      asignadoPor: s.asignado_por || null,
+      asignadoEn: s.asignado_en || null
     }));
 
     return { success: true, solicitudes: ordenarSolicitudes(mapeadas) };

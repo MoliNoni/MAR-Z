@@ -147,6 +147,53 @@
         </div>
       </div>
 
+      <!-- Seccion HU05: Asignar solicitudes (Visible para Coordinadores) -->
+      <div id="asignar-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU05 — Asignar solicitudes a agentes</h2>
+        </div>
+        <div class="box-body">
+          <div id="asignar-error" class="alert-error" role="alert" style="display: none;"></div>
+          <div id="asignar-success" class="alert-success" role="alert" style="display: none;"></div>
+          <table class="table-simple" id="asignar-tabla">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Titulo</th>
+                <th>Estado</th>
+                <th>Asignado actualmente</th>
+                <th>Asignado por</th>
+                <th style="text-align: right;">Asignar a agente activo</th>
+              </tr>
+            </thead>
+            <tbody id="asignar-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Seccion HU05: Bandeja de atencion de solicitudes asignadas (Visible para Agentes) -->
+      <div id="bandeja-atencion-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU05 — Solicitudes asignadas (Bandeja de atencion)</h2>
+        </div>
+        <div class="box-body">
+          <div id="notificaciones-agente-box" class="alert-success" style="display: none; margin-bottom: 16px;"></div>
+          <table class="table-simple" id="bandeja-tabla">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Categoria</th>
+                <th>Titulo</th>
+                <th>Estado</th>
+                <th>Asignado en</th>
+                <th style="text-align: right;">Accion</th>
+              </tr>
+            </thead>
+            <tbody id="bandeja-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- Vista de Detalle de Solicitud (HU03) -->
       <div id="solicitud-detalle-section" class="box" style="display: none;">
         <div class="box-header">
@@ -178,6 +225,15 @@
 
             <div class="detail-label">Propietario:</div>
             <div class="detail-value" id="det-propietario"></div>
+
+            <div class="detail-label">Asignado a:</div>
+            <div class="detail-value" id="det-asignado">Sin asignar</div>
+
+            <div class="detail-label">Asignado por:</div>
+            <div class="detail-value" id="det-asignado-por">-</div>
+
+            <div class="detail-label">Fecha asignacion:</div>
+            <div class="detail-value" id="det-asignado-fecha">-</div>
           </div>
 
           <!-- HU08: Confirmar o reabrir solucion (solo solicitudes Resueltas del solicitante) -->
@@ -190,6 +246,27 @@
             </div>
             <button id="confirmar-solucion-btn" class="btn btn-primary">Confirmar solucion</button>
             <button id="reabrir-solicitud-btn" class="btn btn-default">Reabrir solicitud</button>
+          </div>
+
+          <!-- HU06: Registrar comentarios de trabajo (Visible para Agente y Coordinador) -->
+          <div id="comentarios-seccion" style="margin-top: 24px; border-top: 1px solid var(--color-border-muted); padding-top: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h3 style="font-size: 14px; font-weight: 600;">HU06 — Comentarios de trabajo</h3>
+              <span class="badge-inmutable">Inmutables (no editables)</span>
+            </div>
+            <div id="comentarios-lista">
+              <p style="color: var(--color-fg-muted);">No hay comentarios registrados aun.</p>
+            </div>
+
+            <div id="comentario-nuevo-form-container" style="display: none; margin-top: 16px;">
+              <div id="comentario-error" class="alert-error" role="alert" style="display: none;"></div>
+              <div id="comentario-success" class="alert-success" role="alert" style="display: none;"></div>
+              <div class="form-group">
+                <label for="comentario-nuevo-texto">Nuevo comentario de avance o nota tecnica *</label>
+                <textarea id="comentario-nuevo-texto" placeholder="Documente las acciones tecnicas realizadas o notas de avance (registro inmutable)..."></textarea>
+              </div>
+              <button id="guardar-comentario-btn" class="btn btn-primary btn-sm">Registrar comentario</button>
+            </div>
           </div>
         </div>
       </div>
@@ -206,6 +283,8 @@
   <script src="auth.js"></script>
   <script src="requests.js"></script>
   <script src="solucion.js"></script>
+  <script src="asignacion.js"></script>
+  <script src="comentarios.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

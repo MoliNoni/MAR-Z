@@ -335,3 +335,49 @@ textarea:focus {
   font-size: 12px;
   color: var(--color-fg-muted);
 }
+
+/* Comments (HU06) */
+.comment-card {
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  background-color: var(--color-canvas-default);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.comment-header {
+  background-color: var(--color-canvas-subtle);
+  border-bottom: 1px solid var(--color-border-muted);
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.comment-author {
+  font-weight: 600;
+  color: var(--color-fg-default);
+}
+
+.comment-date {
+  color: var(--color-fg-muted);
+}
+
+.comment-body {
+  padding: 10px 12px;
+  font-size: 13px;
+  white-space: pre-wrap;
+  color: var(--color-fg-default);
+}
+
+.badge-inmutable {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background-color: #f6f8fa;
+  border: 1px solid var(--color-border-default);
+  color: var(--color-fg-muted);
+  margin-left: 6px;
+}
+

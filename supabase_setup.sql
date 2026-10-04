@@ -92,3 +92,57 @@ drop policy if exists "Insertar historial de solicitudes" on public.historial_so
 create policy "Insertar historial de solicitudes"
   on public.historial_solicitudes for insert
   with check (true);
+
+-- 6. Asignacion de solicitudes y notificaciones (Sprint 2 - HU05: Asignar solicitudes)
+-- 6.1 Estado activo para usuarios (validar agente activo)
+alter table public.usuarios add column if not exists activo boolean not null default true;
+
+-- 6.2 Campos de asignacion en solicitudes
+alter table public.solicitudes add column if not exists asignado_a text;
+alter table public.solicitudes add column if not exists asignado_nombre text;
+alter table public.solicitudes add column if not exists asignado_por text;
+alter table public.solicitudes add column if not exists asignado_en timestamptz;
+
+-- 6.3 Tabla de notificaciones para agentes
+create table if not exists public.notificaciones (
+  id bigint generated always as identity primary key,
+  solicitud_id text not null references public.solicitudes(id) on delete cascade,
+  destinatario_id text not null,
+  remitente_id text not null,
+  mensaje text not null,
+  leido boolean not null default false,
+  fecha timestamptz not null default now()
+);
+
+alter table public.notificaciones enable row level security;
+
+drop policy if exists "Permitir todo en notificaciones" on public.notificaciones;
+create policy "Permitir todo en notificaciones"
+  on public.notificaciones for all
+  using (true)
+  with check (true);
+
+-- 7. Comentarios de trabajo sobre solicitudes (Sprint 2 - HU06: Registrar comentarios)
+create table if not exists public.comentarios (
+  id bigint generated always as identity primary key,
+  solicitud_id text not null references public.solicitudes(id) on delete cascade,
+  autor_id text not null,
+  autor_nombre text not null,
+  autor_rol text not null,
+  contenido text not null,
+  fecha timestamptz not null default now()
+);
+
+alter table public.comentarios enable row level security;
+
+-- Los comentarios solo permiten lectura e insercion (inmutables: no se editan ni se eliminan)
+drop policy if exists "Leer comentarios" on public.comentarios;
+create policy "Leer comentarios"
+  on public.comentarios for select
+  using (true);
+
+drop policy if exists "Insertar comentarios" on public.comentarios;
+create policy "Insertar comentarios"
+  on public.comentarios for insert
+  with check (true);
+

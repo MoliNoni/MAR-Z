@@ -3,22 +3,22 @@
 ## HU05 — Asignar solicitudes
 Responsable: Dev 1
 
-- [ ] Implementar asignación a agentes.
-- [ ] Validar que el agente esté activo.
-- [ ] Registrar quién asignó y cuándo.
-- [ ] Mostrar la asignación en la aplicación.
-- [ ] Notificar la asignación.
-- [ ] Probar asignaciones válidas e inválidas.
+- [x] Implementar asignación a agentes.
+- [x] Validar que el agente esté activo.
+- [x] Registrar quién asignó y cuándo.
+- [x] Mostrar la asignación en la aplicación.
+- [x] Notificar la asignación.
+- [x] Probar asignaciones válidas e inválidas.
 
 ## HU06 — Registrar comentarios
 Responsable: Dev 2
 
-- [ ] Crear modelo de comentarios.
-- [ ] Implementar creación de comentarios.
-- [ ] Validar que no estén vacíos.
-- [ ] Guardar autor y fecha.
-- [ ] Impedir edición después de crear.
-- [ ] Probar permisos y persistencia.
+- [x] Crear modelo de comentarios.
+- [x] Implementar creación de comentarios.
+- [x] Validar que no estén vacíos.
+- [x] Guardar autor y fecha.
+- [x] Impedir edición después de crear.
+- [x] Probar permisos y persistencia.
 
 ## HU07 — Cambiar estado
 Responsable: Dev 3
@@ -57,6 +57,7 @@ Notas del cambio:
 - HU02: la creación no cambia, porque el solicitante no asigna prioridad; los campos nuevos quedan vacíos al crear y el coordinador los completa en HU04.
 - HU04: la tabla de priorización pide justificación y fecha objetivo y guarda con el botón "Guardar".
 - Regresión Sprint 1 (2026-09-29): 18/18 OK tras ejecutar las secciones 2.2 y 5 de `supabase_setup.sql` en Supabase. Suite completa (`npm test`, incluye HU08): 23/23 OK.
+- HU05 y HU06 (2026-10-03): Suite completa (`npm test`): 33/33 OK. HU05 valida agentes activos, asignación con trazabilidad de autor/fecha y notificaciones. HU06 asegura comentarios inmutables no vacíos con autor y fecha. Secciones 6 y 7 agregadas a `supabase_setup.sql`.
 
 ## Trabajo conjunto
 

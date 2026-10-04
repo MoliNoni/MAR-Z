@@ -97,6 +97,30 @@ const priorizarSection = document.getElementById('priorizar-section');
 const priorizarTbody = document.getElementById('priorizar-tbody');
 const priorizarError = document.getElementById('priorizar-error');
 
+// Elementos DOM Asignacion (HU05)
+const asignarSection = document.getElementById('asignar-section');
+const asignarTbody = document.getElementById('asignar-tbody');
+const asignarError = document.getElementById('asignar-error');
+const asignarSuccess = document.getElementById('asignar-success');
+
+// Elementos DOM Bandeja de Atencion y Notificaciones (HU05 - Agente)
+const bandejaAtencionSection = document.getElementById('bandeja-atencion-section');
+const bandejaTbody = document.getElementById('bandeja-tbody');
+const notificacionesAgenteBox = document.getElementById('notificaciones-agente-box');
+
+// Elementos DOM Detalle Asignacion (HU05)
+const detAsignado = document.getElementById('det-asignado');
+const detAsignadoPor = document.getElementById('det-asignado-por');
+const detAsignadoFecha = document.getElementById('det-asignado-fecha');
+
+// Elementos DOM Comentarios de Trabajo (HU06)
+const comentariosLista = document.getElementById('comentarios-lista');
+const comentarioNuevoFormContainer = document.getElementById('comentario-nuevo-form-container');
+const comentarioNuevoTexto = document.getElementById('comentario-nuevo-texto');
+const guardarComentarioBtn = document.getElementById('guardar-comentario-btn');
+const comentarioError = document.getElementById('comentario-error');
+const comentarioSuccess = document.getElementById('comentario-success');
+
 let currentUser = null;
 
 // Inicializacion de sesion
@@ -141,6 +165,8 @@ logoutBtn.addEventListener('click', () => {
   sessionStorage.removeItem(SESSION_STORAGE_KEY);
   currentUser = null;
   if (solicitudDetalleSection) solicitudDetalleSection.style.display = 'none';
+  if (asignarSection) asignarSection.style.display = 'none';
+  if (bandejaAtencionSection) bandejaAtencionSection.style.display = 'none';
   showLogin();
 });
 
@@ -201,6 +227,27 @@ function showDashboard(user) {
     renderPriorizarTabla();
   } else {
     priorizarSection.style.display = 'none';
+  }
+
+  // Mostrar seccion HU05 (Asignar solicitudes) si tiene permiso
+  if (asignarSection) {
+    if (hasPermission(user.role, 'asignar_solicitudes')) {
+      asignarSection.style.display = 'block';
+      renderAsignarTabla();
+    } else {
+      asignarSection.style.display = 'none';
+    }
+  }
+
+  // Mostrar seccion HU05 (Bandeja de atencion para agentes) si tiene permiso
+  if (bandejaAtencionSection) {
+    if (hasPermission(user.role, 'atender_solicitudes')) {
+      bandejaAtencionSection.style.display = 'block';
+      renderBandejaAtencion();
+      renderNotificacionesAgente();
+    } else {
+      bandejaAtencionSection.style.display = 'none';
+    }
   }
 
   if (solicitudDetalleSection) {
@@ -298,6 +345,25 @@ window.verDetalle = async function(solicitudId) {
   detActualizacion.textContent = new Date(s.ultimaActualizacion || s.fecha).toLocaleString();
   detPropietario.textContent = `${s.propietario.nombre} (${s.propietario.email})`;
   mostrarAccionesSolucion(s);
+
+  // HU05: Mostrar asignacion
+  const asignacion = s.asignadoNombre
+    ? `${s.asignadoNombre}`
+    : (typeof obtenerAsignacionMemoria === 'function' && obtenerAsignacionMemoria(s.id)
+        ? obtenerAsignacionMemoria(s.id).asignado_nombre
+        : 'Sin asignar');
+
+  const asignador = s.asignadoPor || (typeof obtenerAsignacionMemoria === 'function' && obtenerAsignacionMemoria(s.id)?.asignado_por) || '-';
+  const fechaAsig = (s.asignadoEn || (typeof obtenerAsignacionMemoria === 'function' && obtenerAsignacionMemoria(s.id)?.asignado_en))
+    ? new Date(s.asignadoEn || obtenerAsignacionMemoria(s.id).asignado_en).toLocaleString()
+    : '-';
+
+  if (detAsignado) detAsignado.textContent = asignacion;
+  if (detAsignadoPor) detAsignadoPor.textContent = asignador;
+  if (detAsignadoFecha) detAsignadoFecha.textContent = fechaAsig;
+
+  // HU06: Renderizar comentarios de trabajo
+  await renderComentariosDetalle(s.id);
 
   solicitudDetalleSection.style.display = 'block';
   solicitudDetalleSection.scrollIntoView({ behavior: 'smooth' });
@@ -434,3 +500,225 @@ confirmarSolucionBtn.addEventListener('click', () => {
 reabrirSolicitudBtn.addEventListener('click', () => {
   ejecutarAccionSolucion(id => reabrirSolicitud(id, solucionMotivo.value, currentUser));
 });
+
+// ==========================================================
+// HU05 — ASIGNAR SOLICITUDES & BANDEJA DE ATENCION (Dev 1)
+// ==========================================================
+
+// HU05: Renderizar tabla de asignacion de solicitudes para el Coordinador
+async function renderAsignarTabla() {
+  if (!currentUser || !asignarTbody) return;
+  if (asignarError) asignarError.style.display = 'none';
+
+  // 1. Obtener lista de agentes activos
+  const agentesRes = await consultarAgentesActivos();
+  const agentesActivos = (agentesRes.success && Array.isArray(agentesRes.agentes)) ? agentesRes.agentes : [];
+
+  // 2. Obtener lista de solicitudes
+  const solicitudesRes = await consultarSolicitudesParaPriorizar(currentUser);
+  const solicitudes = (solicitudesRes.success && Array.isArray(solicitudesRes.solicitudes)) ? solicitudesRes.solicitudes : [];
+
+  if (solicitudes.length === 0) {
+    asignarTbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; color: var(--color-fg-muted);">No hay solicitudes disponibles para asignacion.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  asignarTbody.innerHTML = solicitudes.map(s => {
+    const asignacionActual = s.asignadoNombre
+      ? `<strong>${escaparHtml(s.asignadoNombre)}</strong>`
+      : (typeof obtenerAsignacionMemoria === 'function' && obtenerAsignacionMemoria(s.id)
+          ? `<strong>${escaparHtml(obtenerAsignacionMemoria(s.id).asignado_nombre)}</strong>`
+          : '<span style="color: var(--color-fg-muted);">Sin asignar</span>');
+
+    const asignadoPor = s.asignadoPor || (typeof obtenerAsignacionMemoria === 'function' && obtenerAsignacionMemoria(s.id)?.asignado_por) || '-';
+
+    const opcionesAgentes = [
+      '<option value="">-- Seleccionar agente activo --</option>'
+    ].concat(
+      agentesActivos.map(a => `<option value="${a.id}">${escaparHtml(a.nombre)} (${a.role})</option>`)
+    ).join('');
+
+    const estaCerrada = s.estado === 'Cerrado';
+
+    return `
+      <tr>
+        <td><strong>${s.id}</strong></td>
+        <td>${escaparHtml(s.titulo)}</td>
+        <td><span class="tag-nuevo">${s.estado}</span></td>
+        <td>${asignacionActual}</td>
+        <td>${asignadoPor}</td>
+        <td style="text-align: right;">
+          ${estaCerrada
+            ? '<span style="color: var(--color-fg-muted);">Solicitud cerrada</span>'
+            : `
+              <select id="asignar-agente-${s.id}">${opcionesAgentes}</select>
+              <button class="btn btn-default btn-sm" onclick="ejecutarAsignacion('${s.id}')">Asignar</button>
+            `
+          }
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// HU05: Ejecutar la asignacion a un agente
+window.ejecutarAsignacion = async function(solicitudId) {
+  if (!currentUser) return;
+  if (asignarError) asignarError.style.display = 'none';
+  if (asignarSuccess) asignarSuccess.style.display = 'none';
+
+  const selectAgente = document.getElementById(`asignar-agente-${solicitudId}`);
+  if (!selectAgente || !selectAgente.value) {
+    if (asignarError) {
+      asignarError.textContent = 'Debe seleccionar un agente activo de la lista.';
+      asignarError.style.display = 'block';
+    }
+    return;
+  }
+
+  const agenteId = selectAgente.value;
+  const resultado = await asignarSolicitud(solicitudId, agenteId, currentUser);
+
+  if (!resultado.success) {
+    if (asignarError) {
+      asignarError.textContent = resultado.error;
+      asignarError.style.display = 'block';
+    }
+    return;
+  }
+
+  if (asignarSuccess) {
+    asignarSuccess.textContent = `Solicitud ${solicitudId} asignada con exito a ${resultado.solicitud.asignadoNombre}. Notificacion enviada al agente.`;
+    asignarSuccess.style.display = 'block';
+  }
+
+  await renderAsignarTabla();
+};
+
+// HU05: Renderizar bandeja de atencion con solicitudes asignadas al agente
+async function renderBandejaAtencion() {
+  if (!currentUser || !bandejaTbody) return;
+
+  const resultado = await consultarSolicitudesAsignadas(currentUser);
+  const solicitudes = (resultado.success && Array.isArray(resultado.solicitudes)) ? resultado.solicitudes : [];
+
+  if (solicitudes.length === 0) {
+    bandejaTbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; color: var(--color-fg-muted);">No tiene solicitudes asignadas actualmente.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  bandejaTbody.innerHTML = solicitudes.map(s => {
+    const fechaAsig = s.asignadoEn ? new Date(s.asignadoEn).toLocaleString() : new Date(s.fecha).toLocaleString();
+    return `
+      <tr>
+        <td><strong>${s.id}</strong></td>
+        <td>${escaparHtml(s.categoria)}</td>
+        <td>${escaparHtml(s.titulo)}</td>
+        <td><span class="tag-nuevo">${s.estado}</span></td>
+        <td>${fechaAsig}</td>
+        <td style="text-align: right;">
+          <button class="btn btn-default btn-sm" onclick="verDetalle('${s.id}')">Atender / Detalle</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// HU05: Mostrar alertas de notificaciones recientes para el agente
+async function renderNotificacionesAgente() {
+  if (!currentUser || !notificacionesAgenteBox) return;
+
+  const resultado = await consultarNotificaciones(currentUser.id);
+  const notificaciones = (resultado.success && Array.isArray(resultado.notificaciones)) ? resultado.notificaciones : [];
+  const noLeidas = notificaciones.filter(n => !n.leido);
+
+  if (noLeidas.length > 0) {
+    notificacionesAgenteBox.innerHTML = `
+      🔔 <strong>Notificaciones de asignacion:</strong> Tiene ${noLeidas.length} nueva(s) solicitud(es) asignada(s).
+      <ul style="margin-top: 6px; padding-left: 20px;">
+        ${noLeidas.slice(0, 3).map(n => `<li>${escaparHtml(n.mensaje)} <small>(${new Date(n.fecha).toLocaleTimeString()})</small></li>`).join('')}
+      </ul>
+    `;
+    notificacionesAgenteBox.style.display = 'block';
+  } else {
+    notificacionesAgenteBox.style.display = 'none';
+  }
+}
+
+// ==========================================================
+// HU06 — REGISTRAR COMENTARIOS DE TRABAJO (Dev 2)
+// ==========================================================
+
+// HU06: Renderizar lista de comentarios en el detalle de la solicitud
+async function renderComentariosDetalle(solicitudId) {
+  if (!comentariosLista) return;
+  if (comentarioError) comentarioError.style.display = 'none';
+  if (comentarioSuccess) comentarioSuccess.style.display = 'none';
+  if (comentarioNuevoTexto) comentarioNuevoTexto.value = '';
+
+  const resultado = await consultarComentarios(solicitudId, currentUser);
+  const comentarios = (resultado.success && Array.isArray(resultado.comentarios)) ? resultado.comentarios : [];
+
+  if (comentarios.length === 0) {
+    comentariosLista.innerHTML = '<p style="color: var(--color-fg-muted);">No hay comentarios registrados aun.</p>';
+  } else {
+    comentariosLista.innerHTML = comentarios.map(c => `
+      <div class="comment-card">
+        <div class="comment-header">
+          <div>
+            <span class="comment-author">${escaparHtml(c.autorNombre)}</span>
+            <span class="role-badge" style="background-color: #24292f20; color: var(--color-fg-default);">${escaparHtml(c.autorRol)}</span>
+          </div>
+          <span class="comment-date">${new Date(c.fecha).toLocaleString()}</span>
+        </div>
+        <div class="comment-body">${escaparHtml(c.contenido)}</div>
+      </div>
+    `).join('');
+  }
+
+  // Permitir agregar comentarios solo a agentes y coordinadores
+  const puedeComentar = currentUser && (currentUser.role === 'agente' || currentUser.role === 'coordinador');
+  if (comentarioNuevoFormContainer) {
+    comentarioNuevoFormContainer.style.display = puedeComentar ? 'block' : 'none';
+  }
+}
+
+// HU06: Evento para registrar nuevo comentario de trabajo
+if (guardarComentarioBtn) {
+  guardarComentarioBtn.addEventListener('click', async () => {
+    if (!currentUser || !solicitudEnDetalleId) return;
+    if (comentarioError) comentarioError.style.display = 'none';
+    if (comentarioSuccess) comentarioSuccess.style.display = 'none';
+
+    const texto = comentarioNuevoTexto ? comentarioNuevoTexto.value : '';
+    guardarComentarioBtn.disabled = true;
+
+    const resultado = await crearComentario(solicitudEnDetalleId, texto, currentUser);
+    guardarComentarioBtn.disabled = false;
+
+    if (!resultado.success) {
+      if (comentarioError) {
+        comentarioError.textContent = resultado.error;
+        comentarioError.style.display = 'block';
+      }
+      return;
+    }
+
+    if (comentarioSuccess) {
+      comentarioSuccess.textContent = 'Comentario registrado con exito. El registro es permanente e inmutable.';
+      comentarioSuccess.style.display = 'block';
+    }
+
+    if (comentarioNuevoTexto) comentarioNuevoTexto.value = '';
+    await renderComentariosDetalle(solicitudEnDetalleId);
+  });
+}
+
