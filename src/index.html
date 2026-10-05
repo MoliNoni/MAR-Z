@@ -248,6 +248,25 @@
             <button id="reabrir-solicitud-btn" class="btn btn-default">Reabrir solicitud</button>
           </div>
 
+          <!-- HU07: Cambiar estado (solo el agente asignado) -->
+          <div id="estado-acciones" style="display: none; margin-top: 16px; border-top: 1px solid var(--color-border-muted); padding-top: 16px;">
+            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">HU07 — Cambiar estado</h3>
+            <div id="estado-error" class="alert-error" role="alert"></div>
+            <div id="estado-success" class="alert-success" role="alert"></div>
+            <label for="estado-nuevo">Siguiente estado</label>
+            <select id="estado-nuevo"></select>
+            <input type="text" id="estado-motivo" placeholder="Motivo (opcional)">
+            <button id="cambiar-estado-btn" class="btn btn-primary">Actualizar estado</button>
+          </div>
+
+          <!-- HU07: Historial de cambios de estado -->
+          <div id="historial-cambios-section" style="margin-top: 24px; border-top: 1px solid var(--color-border-muted); padding-top: 16px;">
+            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Historial de cambios</h3>
+            <div id="historial-cambios-lista">
+              <p style="color: var(--color-fg-muted);">No hay cambios registrados aun.</p>
+            </div>
+          </div>
+
           <!-- HU06: Registrar comentarios de trabajo (Visible para Agente y Coordinador) -->
           <div id="comentarios-seccion" style="margin-top: 24px; border-top: 1px solid var(--color-border-muted); padding-top: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -282,6 +301,7 @@
   <script src="supabaseClient.js"></script>
   <script src="auth.js"></script>
   <script src="requests.js"></script>
+  <script src="estado.js"></script>
   <script src="solucion.js"></script>
   <script src="asignacion.js"></script>
   <script src="comentarios.js"></script>

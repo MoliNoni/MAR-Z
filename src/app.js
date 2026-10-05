@@ -1,6 +1,6 @@
 /**
  * Controlador de Aplicacion para Frontend - MAR-Z
- * Soporta HU01 (Login/Roles), HU02 (Crear solicitudes), HU03 (Consultar mis solicitudes y detalle), HU04 (Priorizar) y HU08 (Confirmar o reabrir solucion)
+ * Soporta HU01 (Login/Roles), HU02 (Crear solicitudes), HU03 (Consultar mis solicitudes y detalle), HU04 (Priorizar), HU07 (Cambiar estado) y HU08 (Confirmar o reabrir solucion)
  * Integrado con Supabase
  */
 
@@ -120,6 +120,15 @@ const comentarioNuevoTexto = document.getElementById('comentario-nuevo-texto');
 const guardarComentarioBtn = document.getElementById('guardar-comentario-btn');
 const comentarioError = document.getElementById('comentario-error');
 const comentarioSuccess = document.getElementById('comentario-success');
+
+// Elementos DOM Cambio de Estado (HU07)
+const estadoAcciones = document.getElementById('estado-acciones');
+const estadoError = document.getElementById('estado-error');
+const estadoSuccess = document.getElementById('estado-success');
+const estadoNuevo = document.getElementById('estado-nuevo');
+const estadoMotivo = document.getElementById('estado-motivo');
+const cambiarEstadoBtn = document.getElementById('cambiar-estado-btn');
+const historialCambiosLista = document.getElementById('historial-cambios-lista');
 
 let currentUser = null;
 
@@ -345,6 +354,8 @@ window.verDetalle = async function(solicitudId) {
   detActualizacion.textContent = new Date(s.ultimaActualizacion || s.fecha).toLocaleString();
   detPropietario.textContent = `${s.propietario.nombre} (${s.propietario.email})`;
   mostrarAccionesSolucion(s);
+  mostrarAccionesEstado(s);
+  await renderHistorialCambios(s.id);
 
   // HU05: Mostrar asignacion
   const asignacion = s.asignadoNombre
@@ -445,6 +456,85 @@ window.actualizarPrioridad = async function(solicitudId) {
 
   await renderPriorizarTabla();
 };
+
+// HU07: Mostrar solo el siguiente estado permitido al agente asignado.
+function mostrarAccionesEstado(solicitud) {
+  if (!estadoAcciones || !estadoNuevo) return;
+
+  const siguientes = TRANSICIONES_PERMITIDAS[solicitud.estado] || [];
+
+  estadoAcciones.style.display = currentUser && currentUser.role === 'agente' ? 'block' : 'none';
+  estadoError.style.display = 'none';
+  if (estadoSuccess) estadoSuccess.style.display = 'none';
+  estadoMotivo.value = '';
+  estadoNuevo.innerHTML = siguientes.length > 0
+    ? siguientes.map(estado => `<option value="${estado}">${estado}</option>`).join('')
+    : '<option value="">No hay transiciones permitidas</option>';
+  cambiarEstadoBtn.disabled = siguientes.length === 0;
+}
+
+// HU07: Renderizar historial de cambios de estado en el detalle de la solicitud.
+async function renderHistorialCambios(solicitudId) {
+  if (!historialCambiosLista) return;
+
+  const resultado = await consultarHistorialEstado(solicitudId);
+  const historial = (resultado.success && Array.isArray(resultado.historial)) ? resultado.historial : [];
+
+  if (historial.length === 0) {
+    historialCambiosLista.innerHTML = '<p style="color: var(--color-fg-muted);">No hay cambios registrados aun.</p>';
+    return;
+  }
+
+  historialCambiosLista.innerHTML = historial.map(h => {
+    const motivoHtml = h.motivo
+      ? `<div style="margin-top: 4px; font-style: italic; color: var(--color-fg-muted);">Motivo: ${escaparHtml(h.motivo)}</div>`
+      : '';
+    return `
+      <div class="comment-card">
+        <div class="comment-header">
+          <div>
+            <span class="comment-author">${escaparHtml(h.accion)}</span>
+            <span class="role-badge" style="background-color: #24292f20; color: var(--color-fg-default);">${escaparHtml(h.usuarioId)}</span>
+          </div>
+          <span class="comment-date">${new Date(h.fecha).toLocaleString()}</span>
+        </div>
+        <div class="comment-body">
+          <span class="tag-nuevo">${escaparHtml(h.estadoAnterior || '-')}</span>
+          → <span class="tag-nuevo">${escaparHtml(h.estadoNuevo || '-')}</span>
+          ${motivoHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// HU07: Persistir el cambio y refrescar estado actual y bandeja del agente.
+if (cambiarEstadoBtn) {
+  cambiarEstadoBtn.addEventListener('click', async () => {
+    if (!currentUser || !solicitudEnDetalleId) return;
+
+    estadoError.style.display = 'none';
+    if (estadoSuccess) estadoSuccess.style.display = 'none';
+    cambiarEstadoBtn.disabled = true;
+    const nuevoEstado = estadoNuevo.value;
+    const resultado = await cambiarEstado(solicitudEnDetalleId, nuevoEstado, currentUser, estadoMotivo.value);
+    cambiarEstadoBtn.disabled = false;
+
+    if (!resultado.success) {
+      estadoError.textContent = resultado.error;
+      estadoError.style.display = 'block';
+      return;
+    }
+
+    if (estadoSuccess) {
+      estadoSuccess.textContent = `Estado actualizado a "${nuevoEstado}" exitosamente.`;
+      estadoSuccess.style.display = 'block';
+    }
+
+    await renderBandejaAtencion();
+    await window.verDetalle(solicitudEnDetalleId);
+  });
+}
 
 // Elementos DOM Confirmar o reabrir solucion (HU08)
 const solucionAcciones = document.getElementById('solucion-acciones');
