@@ -194,6 +194,138 @@
         </div>
       </div>
 
+      <!-- Seccion HU09: Buscar y filtrar solicitudes (Visible para todos los usuarios autenticados) -->
+      <div id="busqueda-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU09 — Buscar y filtrar solicitudes</h2>
+        </div>
+        <div class="box-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="busqueda-texto">Buscar por texto</label>
+              <input type="text" id="busqueda-texto" placeholder="Buscar en titulo o descripcion...">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="filtro-estado">Estado</label>
+              <select id="filtro-estado">
+                <option value="">Todos los estados</option>
+                <option value="Nuevo">Nuevo</option>
+                <option value="En Proceso">En Proceso</option>
+                <option value="Resuelto">Resuelto</option>
+                <option value="Cerrado">Cerrado</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="filtro-prioridad">Prioridad</label>
+              <select id="filtro-prioridad">
+                <option value="">Todas las prioridades</option>
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+                <option value="Sin prioridad">Sin prioridad</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="filtro-categoria">Categoria</label>
+              <select id="filtro-categoria">
+                <option value="">Todas las categorias</option>
+                <option value="Software">Software</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Redes y Comunicaciones">Redes y Comunicaciones</option>
+                <option value="Accesos y Cuentas">Accesos y Cuentas</option>
+                <option value="Soporte General">Soporte General</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-bottom: 16px; align-items: center;">
+            <button id="btn-aplicar-filtros" class="btn btn-primary btn-sm">Buscar y filtrar</button>
+            <button id="btn-limpiar-filtros" class="btn btn-default btn-sm">Limpiar</button>
+            <span id="busqueda-conteo" style="color: var(--color-fg-muted); font-size: 12px;"></span>
+          </div>
+          <table class="table-simple" id="busqueda-tabla">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Categoria</th>
+                <th>Titulo</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+                <th>Fecha</th>
+                <th style="text-align: right;">Accion</th>
+              </tr>
+            </thead>
+            <tbody id="busqueda-tbody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--color-fg-muted);">Utilice los filtros para buscar solicitudes.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Seccion HU10: Indicadores de gestion (Visible para Coordinador) -->
+      <div id="indicadores-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU10 — Indicadores de gestion del servicio</h2>
+          <span class="badge-inmutable">Metricas agregadas (sin rankings)</span>
+        </div>
+        <div class="box-body">
+          <div style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="ind-filtro-estado">Filtrar por estado</label>
+              <select id="ind-filtro-estado">
+                <option value="">Todos los estados</option>
+                <option value="Nuevo">Nuevo</option>
+                <option value="En Proceso">En Proceso</option>
+                <option value="Resuelto">Resuelto</option>
+                <option value="Cerrado">Cerrado</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="ind-filtro-prioridad">Filtrar por prioridad</label>
+              <select id="ind-filtro-prioridad">
+                <option value="">Todas las prioridades</option>
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+                <option value="Sin prioridad">Sin prioridad</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="ind-filtro-categoria">Filtrar por categoria</label>
+              <select id="ind-filtro-categoria">
+                <option value="">Todas las categorias</option>
+                <option value="Software">Software</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Redes y Comunicaciones">Redes y Comunicaciones</option>
+                <option value="Accesos y Cuentas">Accesos y Cuentas</option>
+                <option value="Soporte General">Soporte General</option>
+              </select>
+            </div>
+            <button id="btn-calcular-indicadores" class="btn btn-primary btn-sm">Actualizar indicadores</button>
+          </div>
+
+          <div id="indicadores-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <div class="module-item" style="text-align: center;">
+              <div style="font-size: 28px; font-weight: bold; color: var(--color-accent-fg);" id="ind-volumen-total">0</div>
+              <div style="font-size: 12px; color: var(--color-fg-muted);">Total solicitudes</div>
+            </div>
+            <div class="module-item" style="text-align: center;">
+              <div style="font-size: 28px; font-weight: bold; color: var(--color-fg-default);" id="ind-tiempo-mediano">0 h</div>
+              <div style="font-size: 12px; color: var(--color-fg-muted);">Tiempo mediano de ciclo</div>
+            </div>
+            <div class="module-item">
+              <h4 style="font-size: 12px; text-transform: uppercase; color: var(--color-fg-muted); margin-bottom: 8px;">Volumen por Estado</h4>
+              <div id="ind-desglose-estado" style="font-size: 12px; line-height: 1.6;"></div>
+            </div>
+            <div class="module-item">
+              <h4 style="font-size: 12px; text-transform: uppercase; color: var(--color-fg-muted); margin-bottom: 8px;">Por Categoria</h4>
+              <div id="ind-desglose-categoria" style="font-size: 12px; line-height: 1.6;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Vista de Detalle de Solicitud (HU03) -->
       <div id="solicitud-detalle-section" class="box" style="display: none;">
         <div class="box-header">
@@ -305,6 +437,8 @@
   <script src="solucion.js"></script>
   <script src="asignacion.js"></script>
   <script src="comentarios.js"></script>
+  <script src="busqueda.js"></script>
+  <script src="indicadores.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -130,6 +130,28 @@ const estadoMotivo = document.getElementById('estado-motivo');
 const cambiarEstadoBtn = document.getElementById('cambiar-estado-btn');
 const historialCambiosLista = document.getElementById('historial-cambios-lista');
 
+// Elementos DOM Busqueda y Filtros (HU09)
+const busquedaSection = document.getElementById('busqueda-section');
+const busquedaTexto = document.getElementById('busqueda-texto');
+const filtroEstado = document.getElementById('filtro-estado');
+const filtroPrioridad = document.getElementById('filtro-prioridad');
+const filtroCategoria = document.getElementById('filtro-categoria');
+const btnAplicarFiltros = document.getElementById('btn-aplicar-filtros');
+const btnLimpiarFiltros = document.getElementById('btn-limpiar-filtros');
+const busquedaConteo = document.getElementById('busqueda-conteo');
+const busquedaTbody = document.getElementById('busqueda-tbody');
+
+// Elementos DOM Indicadores (HU10)
+const indicadoresSection = document.getElementById('indicadores-section');
+const indFiltroEstado = document.getElementById('ind-filtro-estado');
+const indFiltroPrioridad = document.getElementById('ind-filtro-prioridad');
+const indFiltroCategoria = document.getElementById('ind-filtro-categoria');
+const btnCalcularIndicadores = document.getElementById('btn-calcular-indicadores');
+const indVolumenTotal = document.getElementById('ind-volumen-total');
+const indTiempoMediano = document.getElementById('ind-tiempo-mediano');
+const indDesgloseEstado = document.getElementById('ind-desglose-estado');
+const indDesgloseCategoria = document.getElementById('ind-desglose-categoria');
+
 let currentUser = null;
 
 // Inicializacion de sesion
@@ -176,6 +198,8 @@ logoutBtn.addEventListener('click', () => {
   if (solicitudDetalleSection) solicitudDetalleSection.style.display = 'none';
   if (asignarSection) asignarSection.style.display = 'none';
   if (bandejaAtencionSection) bandejaAtencionSection.style.display = 'none';
+  if (busquedaSection) busquedaSection.style.display = 'none';
+  if (indicadoresSection) indicadoresSection.style.display = 'none';
   showLogin();
 });
 
@@ -256,6 +280,22 @@ function showDashboard(user) {
       renderNotificacionesAgente();
     } else {
       bandejaAtencionSection.style.display = 'none';
+    }
+  }
+
+  // Mostrar seccion HU09 (Buscar y filtrar solicitudes) para todo usuario autenticado
+  if (busquedaSection) {
+    busquedaSection.style.display = 'block';
+    ejecutarBusquedaYFiltro();
+  }
+
+  // Mostrar seccion HU10 (Indicadores de gestion) para el Coordinador
+  if (indicadoresSection) {
+    if (hasPermission(user.role, 'indicadores')) {
+      indicadoresSection.style.display = 'block';
+      cargarIndicadores();
+    } else {
+      indicadoresSection.style.display = 'none';
     }
   }
 
@@ -811,4 +851,124 @@ if (guardarComentarioBtn) {
     await renderComentariosDetalle(solicitudEnDetalleId);
   });
 }
+
+// ==========================================================
+// HU09 — BUSCAR Y FILTRAR SOLICITUDES (Dev 1)
+// ==========================================================
+
+async function ejecutarBusquedaYFiltro() {
+  if (!currentUser || !busquedaTbody) return;
+
+  const filtros = {
+    texto: busquedaTexto ? busquedaTexto.value.trim() : '',
+    estado: filtroEstado ? filtroEstado.value : '',
+    prioridad: filtroPrioridad ? filtroPrioridad.value : '',
+    categoria: filtroCategoria ? filtroCategoria.value : ''
+  };
+
+  const resultado = await buscarYFiltrarSolicitudes(filtros, currentUser);
+  const solicitudes = (resultado.success && Array.isArray(resultado.solicitudes)) ? resultado.solicitudes : [];
+
+  if (busquedaConteo) {
+    busquedaConteo.textContent = `${solicitudes.length} solicitud(es) encontrada(s)`;
+  }
+
+  if (solicitudes.length === 0) {
+    busquedaTbody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align: center; color: var(--color-fg-muted);">No se encontraron solicitudes con los filtros aplicados.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  busquedaTbody.innerHTML = solicitudes.map(s => {
+    const prio = s.prioridad || 'Sin prioridad';
+    const fechaFormateada = new Date(s.fecha).toLocaleDateString();
+    return `
+      <tr>
+        <td><strong>${s.id}</strong></td>
+        <td>${escaparHtml(s.categoria)}</td>
+        <td>${escaparHtml(s.titulo)}</td>
+        <td><span class="tag-nuevo">${s.estado}</span></td>
+        <td>${escaparHtml(prio)}</td>
+        <td>${fechaFormateada}</td>
+        <td style="text-align: right;">
+          <button class="btn btn-default btn-sm" onclick="verDetalle('${s.id}')">Ver detalle</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+if (btnAplicarFiltros) {
+  btnAplicarFiltros.addEventListener('click', () => {
+    ejecutarBusquedaYFiltro();
+  });
+}
+
+if (btnLimpiarFiltros) {
+  btnLimpiarFiltros.addEventListener('click', () => {
+    if (busquedaTexto) busquedaTexto.value = '';
+    if (filtroEstado) filtroEstado.value = '';
+    if (filtroPrioridad) filtroPrioridad.value = '';
+    if (filtroCategoria) filtroCategoria.value = '';
+    ejecutarBusquedaYFiltro();
+  });
+}
+
+// ==========================================================
+// HU10 — INDICADORES DE GESTION (Dev 2)
+// ==========================================================
+
+async function cargarIndicadores() {
+  if (!currentUser || !indicadoresSection) return;
+
+  const filtros = {
+    estado: indFiltroEstado ? indFiltroEstado.value : '',
+    prioridad: indFiltroPrioridad ? indFiltroPrioridad.value : '',
+    categoria: indFiltroCategoria ? indFiltroCategoria.value : ''
+  };
+
+  const resultado = await consultarIndicadores(filtros, currentUser);
+  if (!resultado.success || !resultado.indicadores) {
+    return;
+  }
+
+  const ind = resultado.indicadores;
+
+  if (indVolumenTotal) {
+    indVolumenTotal.textContent = ind.totalSolicitudes;
+  }
+
+  if (indTiempoMediano) {
+    const cant = ind.tiempoMedianoCiclo.solicitudesComputadas;
+    indTiempoMediano.textContent = `${ind.tiempoMedianoCiclo.valor} h (${cant} resueltas)`;
+  }
+
+  if (indDesgloseEstado) {
+    const vol = ind.volumenPorEstado;
+    indDesgloseEstado.innerHTML = `
+      <div><strong>Nuevo:</strong> ${vol['Nuevo'] || 0}</div>
+      <div><strong>En Proceso:</strong> ${vol['En Proceso'] || 0}</div>
+      <div><strong>Resuelto:</strong> ${vol['Resuelto'] || 0}</div>
+      <div><strong>Cerrado:</strong> ${vol['Cerrado'] || 0}</div>
+    `;
+  }
+
+  if (indDesgloseCategoria) {
+    const cats = ind.desglosePorCategoria;
+    const lineas = Object.entries(cats).map(([cat, cant]) =>
+      `<div><strong>${escaparHtml(cat)}:</strong> ${cant}</div>`
+    );
+    indDesgloseCategoria.innerHTML = lineas.length > 0 ? lineas.join('') : '<div>Sin datos</div>';
+  }
+}
+
+if (btnCalcularIndicadores) {
+  btnCalcularIndicadores.addEventListener('click', () => {
+    cargarIndicadores();
+  });
+}
+
 
