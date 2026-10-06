@@ -271,6 +271,10 @@ async function obtenerDetalleSolicitud(solicitudId, usuario) {
         estado: data.estado,
         fecha: data.fecha,
         ultimaActualizacion: data.ultima_actualizacion,
+        asignadoA: data.asignado_a || null,
+        asignadoNombre: data.asignado_nombre || null,
+        asignadoPor: data.asignado_por || null,
+        asignadoEn: data.asignado_en || null,
         propietario: {
           id: data.propietario_id,
           nombre: data.propietario_nombre,
@@ -343,8 +347,14 @@ async function consultarSolicitudesParaPriorizar(usuario) {
       estado: s.estado,
       fecha: s.fecha,
       prioridad: s.prioridad,
+      prioridadJustificacion: s.prioridad_justificacion,
+      prioridadFechaObjetivo: s.prioridad_fecha_objetivo,
       prioridadActualizadaPor: s.prioridad_actualizada_por,
-      prioridadActualizadaEn: s.prioridad_actualizada_en
+      prioridadActualizadaEn: s.prioridad_actualizada_en,
+      asignadoA: s.asignado_a || null,
+      asignadoNombre: s.asignado_nombre || null,
+      asignadoPor: s.asignado_por || null,
+      asignadoEn: s.asignado_en || null
     }));
 
     return { success: true, solicitudes: ordenarSolicitudes(mapeadas) };
@@ -354,9 +364,42 @@ async function consultarSolicitudesParaPriorizar(usuario) {
 }
 
 /**
- * HU04: Cambia la prioridad de una solicitud registrando quien y cuando.
+ * Cambio Sprint 2: la prioridad Alta exige justificacion y fecha objetivo (YYYY-MM-DD, no pasada).
  */
-async function cambiarPrioridad(solicitudId, prioridad, usuario) {
+function validarDetallePrioridad(prioridad, detalle) {
+  if (prioridad !== 'Alta') {
+    return { valido: true };
+  }
+
+  const { justificacion, fechaObjetivo } = detalle || {};
+
+  if (!justificacion || typeof justificacion !== 'string' || justificacion.trim() === '') {
+    return { valido: false, error: 'La prioridad Alta requiere una justificacion.' };
+  }
+
+  // La ida y vuelta por Date descarta fechas inexistentes como 2026-02-31
+  const fechaValida = typeof fechaObjetivo === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(fechaObjetivo) &&
+    !isNaN(Date.parse(fechaObjetivo)) &&
+    new Date(fechaObjetivo).toISOString().slice(0, 10) === fechaObjetivo;
+
+  if (!fechaValida) {
+    return { valido: false, error: 'La prioridad Alta requiere una fecha objetivo valida.' };
+  }
+
+  const hoy = new Date().toISOString().slice(0, 10);
+  if (fechaObjetivo < hoy) {
+    return { valido: false, error: 'La fecha objetivo no puede estar en el pasado.' };
+  }
+
+  return { valido: true };
+}
+
+/**
+ * HU04: Cambia la prioridad de una solicitud registrando quien y cuando.
+ * Cambio Sprint 2: detalle = { justificacion, fechaObjetivo }, obligatorio solo para Alta.
+ */
+async function cambiarPrioridad(solicitudId, prioridad, usuario, detalle) {
   if (!esCoordinador(usuario)) {
     return { success: false, error: 'Solo el coordinador puede priorizar solicitudes.' };
   }
@@ -364,6 +407,13 @@ async function cambiarPrioridad(solicitudId, prioridad, usuario) {
   if (!PRIORIDADES.includes(prioridad)) {
     return { success: false, error: 'La prioridad seleccionada no es valida.' };
   }
+
+  const validacion = validarDetallePrioridad(prioridad, detalle);
+  if (!validacion.valido) {
+    return { success: false, error: validacion.error };
+  }
+
+  const esAlta = prioridad === 'Alta';
 
   const client = getClient();
   if (!client) {
@@ -377,6 +427,9 @@ async function cambiarPrioridad(solicitudId, prioridad, usuario) {
       .from('solicitudes')
       .update({
         prioridad,
+        // Solo Alta conserva justificacion y fecha objetivo; el resto las limpia
+        prioridad_justificacion: esAlta ? detalle.justificacion.trim() : null,
+        prioridad_fecha_objetivo: esAlta ? detalle.fechaObjetivo : null,
         prioridad_actualizada_por: usuario.id,
         prioridad_actualizada_en: ahora,
         ultima_actualizacion: ahora
@@ -398,6 +451,8 @@ async function cambiarPrioridad(solicitudId, prioridad, usuario) {
       solicitud: {
         id: data.id,
         prioridad: data.prioridad,
+        prioridadJustificacion: data.prioridad_justificacion,
+        prioridadFechaObjetivo: data.prioridad_fecha_objetivo,
         prioridadActualizadaPor: data.prioridad_actualizada_por,
         prioridadActualizadaEn: data.prioridad_actualizada_en
       }
@@ -417,6 +472,7 @@ if (typeof module !== 'undefined' && module.exports) {
     consultarMisSolicitudes,
     obtenerDetalleSolicitud,
     ordenarSolicitudes,
+    validarDetallePrioridad,
     consultarSolicitudesParaPriorizar,
     cambiarPrioridad
   };

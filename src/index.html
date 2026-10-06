@@ -139,11 +139,204 @@
                 <th>Estado</th>
                 <th>Fecha</th>
                 <th>Ultimo cambio de prioridad</th>
-                <th style="text-align: right;">Prioridad</th>
+                <th style="text-align: right;">Prioridad (Alta: justificacion y fecha objetivo)</th>
               </tr>
             </thead>
             <tbody id="priorizar-tbody"></tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Seccion HU05: Asignar solicitudes (Visible para Coordinadores) -->
+      <div id="asignar-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU05 — Asignar solicitudes a agentes</h2>
+        </div>
+        <div class="box-body">
+          <div id="asignar-error" class="alert-error" role="alert" style="display: none;"></div>
+          <div id="asignar-success" class="alert-success" role="alert" style="display: none;"></div>
+          <table class="table-simple" id="asignar-tabla">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Titulo</th>
+                <th>Estado</th>
+                <th>Asignado actualmente</th>
+                <th>Asignado por</th>
+                <th style="text-align: right;">Asignar a agente activo</th>
+              </tr>
+            </thead>
+            <tbody id="asignar-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Seccion HU05: Bandeja de atencion de solicitudes asignadas (Visible para Agentes) -->
+      <div id="bandeja-atencion-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU05 — Solicitudes asignadas (Bandeja de atencion)</h2>
+        </div>
+        <div class="box-body">
+          <div id="notificaciones-agente-box" class="alert-success" style="display: none; margin-bottom: 16px;"></div>
+          <table class="table-simple" id="bandeja-tabla">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Categoria</th>
+                <th>Titulo</th>
+                <th>Estado</th>
+                <th>Asignado en</th>
+                <th style="text-align: right;">Accion</th>
+              </tr>
+            </thead>
+            <tbody id="bandeja-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Seccion HU09: Buscar y filtrar solicitudes (Visible para todos los usuarios autenticados) -->
+      <div id="busqueda-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU09 — Buscar y filtrar solicitudes</h2>
+        </div>
+        <div class="box-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="busqueda-texto">Buscar por texto</label>
+              <input type="text" id="busqueda-texto" placeholder="Buscar en titulo o descripcion...">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="filtro-estado">Estado</label>
+              <select id="filtro-estado">
+                <option value="">Todos los estados</option>
+                <option value="Nuevo">Nuevo</option>
+                <option value="En Proceso">En Proceso</option>
+                <option value="Resuelto">Resuelto</option>
+                <option value="Cerrado">Cerrado</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="filtro-prioridad">Prioridad</label>
+              <select id="filtro-prioridad">
+                <option value="">Todas las prioridades</option>
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+                <option value="Sin prioridad">Sin prioridad</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="filtro-categoria">Categoria</label>
+              <select id="filtro-categoria">
+                <option value="">Todas las categorias</option>
+                <option value="Software">Software</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Redes y Comunicaciones">Redes y Comunicaciones</option>
+                <option value="Accesos y Cuentas">Accesos y Cuentas</option>
+                <option value="Soporte General">Soporte General</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-bottom: 16px; align-items: center;">
+            <button id="btn-aplicar-filtros" class="btn btn-primary btn-sm">Buscar y filtrar</button>
+            <button id="btn-limpiar-filtros" class="btn btn-default btn-sm">Limpiar</button>
+            <span id="busqueda-conteo" style="color: var(--color-fg-muted); font-size: 12px;"></span>
+          </div>
+          <table class="table-simple" id="busqueda-tabla">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Categoria</th>
+                <th>Titulo</th>
+                <th>Estado</th>
+                <th>Prioridad</th>
+                <th>Fecha</th>
+                <th style="text-align: right;">Accion</th>
+              </tr>
+            </thead>
+            <tbody id="busqueda-tbody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--color-fg-muted);">Utilice los filtros para buscar solicitudes.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Seccion HU10: Indicadores de gestion (Visible para Coordinador) -->
+      <div id="indicadores-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU10 — Indicadores de gestion del servicio</h2>
+          <span class="badge-inmutable">Metricas agregadas (sin rankings)</span>
+        </div>
+        <div class="box-body">
+          <div style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="ind-filtro-estado">Filtrar por estado</label>
+              <select id="ind-filtro-estado">
+                <option value="">Todos los estados</option>
+                <option value="Nuevo">Nuevo</option>
+                <option value="En Proceso">En Proceso</option>
+                <option value="Resuelto">Resuelto</option>
+                <option value="Cerrado">Cerrado</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="ind-filtro-prioridad">Filtrar por prioridad</label>
+              <select id="ind-filtro-prioridad">
+                <option value="">Todas las prioridades</option>
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+                <option value="Sin prioridad">Sin prioridad</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="ind-filtro-categoria">Filtrar por categoria</label>
+              <select id="ind-filtro-categoria">
+                <option value="">Todas las categorias</option>
+                <option value="Software">Software</option>
+                <option value="Hardware">Hardware</option>
+                <option value="Redes y Comunicaciones">Redes y Comunicaciones</option>
+                <option value="Accesos y Cuentas">Accesos y Cuentas</option>
+                <option value="Soporte General">Soporte General</option>
+              </select>
+            </div>
+            <button id="btn-calcular-indicadores" class="btn btn-primary btn-sm">Actualizar indicadores</button>
+          </div>
+
+          <div id="indicadores-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <div class="module-item" style="text-align: center;">
+              <div style="font-size: 28px; font-weight: bold; color: var(--color-accent-fg);" id="ind-volumen-total">0</div>
+              <div style="font-size: 12px; color: var(--color-fg-muted);">Total solicitudes</div>
+            </div>
+            <div class="module-item" style="text-align: center;">
+              <div style="font-size: 28px; font-weight: bold; color: var(--color-fg-default);" id="ind-tiempo-mediano">0 h</div>
+              <div style="font-size: 12px; color: var(--color-fg-muted);">Tiempo mediano de ciclo</div>
+            </div>
+            <div class="module-item">
+              <h4 style="font-size: 12px; text-transform: uppercase; color: var(--color-fg-muted); margin-bottom: 8px;">Volumen por Estado</h4>
+              <div id="ind-desglose-estado" style="font-size: 12px; line-height: 1.6;"></div>
+            </div>
+            <div class="module-item">
+              <h4 style="font-size: 12px; text-transform: uppercase; color: var(--color-fg-muted); margin-bottom: 8px;">Por Categoria</h4>
+              <div id="ind-desglose-categoria" style="font-size: 12px; line-height: 1.6;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seccion HU12: Exportar reporte (Visible para Coordinador) -->
+      <div id="exportar-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU12 — Exportar reporte CSV</h2>
+          <span class="badge-inmutable">Sin texto libre ni credenciales</span>
+        </div>
+        <div class="box-body">
+          <div id="exportar-error" class="alert-error" role="alert"></div>
+          <div id="exportar-success" class="alert-success" role="alert"></div>
+          <p style="font-size: 12px; color: var(--color-fg-muted); margin-bottom: 12px;">Usa los filtros de estado, prioridad y categoria de los indicadores.</p>
+          <button id="btn-exportar-csv" class="btn btn-primary btn-sm">Exportar CSV</button>
         </div>
       </div>
 
@@ -178,6 +371,67 @@
 
             <div class="detail-label">Propietario:</div>
             <div class="detail-value" id="det-propietario"></div>
+
+            <div class="detail-label">Asignado a:</div>
+            <div class="detail-value" id="det-asignado">Sin asignar</div>
+
+            <div class="detail-label">Asignado por:</div>
+            <div class="detail-value" id="det-asignado-por">-</div>
+
+            <div class="detail-label">Fecha asignacion:</div>
+            <div class="detail-value" id="det-asignado-fecha">-</div>
+          </div>
+
+          <!-- HU08: Confirmar o reabrir solucion (solo solicitudes Resueltas del solicitante) -->
+          <div id="solucion-error" class="alert-error" role="alert" style="margin-top: 16px;"></div>
+          <div id="solucion-success" class="alert-success" role="alert" style="margin-top: 16px;"></div>
+          <div id="solucion-acciones" style="display: none; margin-top: 16px;">
+            <div class="form-group">
+              <label for="solucion-motivo">Motivo de reapertura</label>
+              <textarea id="solucion-motivo" placeholder="Indique por que la solucion no resolvio el problema..."></textarea>
+            </div>
+            <button id="confirmar-solucion-btn" class="btn btn-primary">Confirmar solucion</button>
+            <button id="reabrir-solicitud-btn" class="btn btn-default">Reabrir solicitud</button>
+          </div>
+
+          <!-- HU07: Cambiar estado (solo el agente asignado) -->
+          <div id="estado-acciones" style="display: none; margin-top: 16px; border-top: 1px solid var(--color-border-muted); padding-top: 16px;">
+            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">HU07 — Cambiar estado</h3>
+            <div id="estado-error" class="alert-error" role="alert"></div>
+            <div id="estado-success" class="alert-success" role="alert"></div>
+            <label for="estado-nuevo">Siguiente estado</label>
+            <select id="estado-nuevo"></select>
+            <input type="text" id="estado-motivo" placeholder="Motivo (opcional)">
+            <button id="cambiar-estado-btn" class="btn btn-primary">Actualizar estado</button>
+          </div>
+
+          <!-- HU07: Historial de cambios de estado -->
+          <div id="historial-cambios-section" style="margin-top: 24px; border-top: 1px solid var(--color-border-muted); padding-top: 16px;">
+            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Historial de cambios</h3>
+            <div id="historial-cambios-lista">
+              <p style="color: var(--color-fg-muted);">No hay cambios registrados aun.</p>
+            </div>
+          </div>
+
+          <!-- HU06: Registrar comentarios de trabajo (Visible para Agente y Coordinador) -->
+          <div id="comentarios-seccion" style="margin-top: 24px; border-top: 1px solid var(--color-border-muted); padding-top: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h3 style="font-size: 14px; font-weight: 600;">HU06 — Comentarios de trabajo</h3>
+              <span class="badge-inmutable">Inmutables (no editables)</span>
+            </div>
+            <div id="comentarios-lista">
+              <p style="color: var(--color-fg-muted);">No hay comentarios registrados aun.</p>
+            </div>
+
+            <div id="comentario-nuevo-form-container" style="display: none; margin-top: 16px;">
+              <div id="comentario-error" class="alert-error" role="alert" style="display: none;"></div>
+              <div id="comentario-success" class="alert-success" role="alert" style="display: none;"></div>
+              <div class="form-group">
+                <label for="comentario-nuevo-texto">Nuevo comentario de avance o nota tecnica *</label>
+                <textarea id="comentario-nuevo-texto" placeholder="Documente las acciones tecnicas realizadas o notas de avance (registro inmutable)..."></textarea>
+              </div>
+              <button id="guardar-comentario-btn" class="btn btn-primary btn-sm">Registrar comentario</button>
+            </div>
           </div>
         </div>
       </div>
@@ -193,6 +447,13 @@
   <script src="supabaseClient.js"></script>
   <script src="auth.js"></script>
   <script src="requests.js"></script>
+  <script src="estado.js"></script>
+  <script src="solucion.js"></script>
+  <script src="asignacion.js"></script>
+  <script src="comentarios.js"></script>
+  <script src="busqueda.js"></script>
+  <script src="indicadores.js"></script>
+  <script src="exportacion.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "build": "echo Ready",
+    "dev": "node --watch server.js",
     "start": "node server.js",
     "test": "node --test tests/*.test.js",
     "test:supabase": "node tests/test_supabase_live.js"
