@@ -23,13 +23,13 @@ Responsable: Dev 2
 ## HU07 — Cambiar estado
 Responsable: Dev 3
 
-- [ ] Definir transiciones de estado permitidas.
-- [ ] Implementar cambio de estado.
-- [ ] Rechazar transiciones inválidas.
-- [ ] Registrar historial de cambios.
-- [ ] Mostrar estado actual.
-- [ ] Probar el flujo completo.
-- [ ] Usar la tabla compartida `historial_solicitudes` (creada en HU08, ver `supabase_setup.sql`) para el historial, con los campos `solicitud_id`, `accion`, `estado_anterior`, `estado_nuevo`, `motivo`, `usuario_id` y `fecha`. Tener en cuenta que HU08 ya hace las transiciones Resuelto → Cerrado (confirmar) y Resuelto → En Proceso (reabrir).
+- [x] Definir transiciones de estado permitidas.
+- [x] Implementar cambio de estado.
+- [x] Rechazar transiciones inválidas.
+- [x] Registrar historial de cambios.
+- [x] Mostrar estado actual.
+- [x] Probar el flujo completo.
+- [x] Usar la tabla compartida `historial_solicitudes` (creada en HU08, ver `supabase_setup.sql`) para el historial, con los campos `solicitud_id`, `accion`, `estado_anterior`, `estado_nuevo`, `motivo`, `usuario_id` y `fecha`. Tener en cuenta que HU08 ya hace las transiciones Resuelto → Cerrado (confirmar) y Resuelto → En Proceso (reabrir).
 
 ## HU08 — Confirmar o reabrir solución
 Responsable: Dev 4
@@ -61,8 +61,9 @@ Notas del cambio:
 
 ## Trabajo conjunto
 
-- [ ] Integrar HU05-HU08.
-- [ ] Ejecutar pruebas de regresión.
-- [ ] Revisar criterios de aceptación.
-- [ ] Registrar defectos y retrabajo.
-- [ ] Preparar evidencia de R y E2.
+- [x] Integrar HU05-HU08.
+- [x] Ejecutar pruebas de regresión.
+- [x] Revisar criterios de aceptación.
+- [x] Registrar defectos y retrabajo.
+- [x] Preparar evidencia de R y E2.
+Cierre del Sprint 2 (2026-10-05): HU05-HU08 integradas sobre `historial_solicitudes`. Retrabajo: se ejecutaron en Supabase las secciones 6 y 7 que faltaban; verificado que asignaciones, notificaciones y comentarios persisten y que los comentarios no se pueden editar. Suite completa (`npm test`): OK.

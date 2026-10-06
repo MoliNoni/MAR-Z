@@ -146,3 +146,25 @@ create policy "Insertar comentarios"
   on public.comentarios for insert
   with check (true);
 
+
+-- 8. Registro de exportaciones de reportes (Sprint 3 - HU12: Exportar reporte)
+create table if not exists public.exportaciones (
+  id bigint generated always as identity primary key,
+  usuario_id text not null,
+  filtros jsonb not null default '{}'::jsonb,
+  cantidad integer not null,
+  fecha timestamptz not null default now()
+);
+
+alter table public.exportaciones enable row level security;
+
+-- El registro solo admite lectura e insercion (no se edita ni se borra)
+drop policy if exists "Leer exportaciones" on public.exportaciones;
+create policy "Leer exportaciones"
+  on public.exportaciones for select
+  using (true);
+
+drop policy if exists "Insertar exportaciones" on public.exportaciones;
+create policy "Insertar exportaciones"
+  on public.exportaciones for insert
+  with check (true);

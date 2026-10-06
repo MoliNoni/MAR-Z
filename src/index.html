@@ -326,6 +326,20 @@
         </div>
       </div>
 
+      <!-- Seccion HU12: Exportar reporte (Visible para Coordinador) -->
+      <div id="exportar-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU12 — Exportar reporte CSV</h2>
+          <span class="badge-inmutable">Sin texto libre ni credenciales</span>
+        </div>
+        <div class="box-body">
+          <div id="exportar-error" class="alert-error" role="alert"></div>
+          <div id="exportar-success" class="alert-success" role="alert"></div>
+          <p style="font-size: 12px; color: var(--color-fg-muted); margin-bottom: 12px;">Usa los filtros de estado, prioridad y categoria de los indicadores.</p>
+          <button id="btn-exportar-csv" class="btn btn-primary btn-sm">Exportar CSV</button>
+        </div>
+      </div>
+
       <!-- Vista de Detalle de Solicitud (HU03) -->
       <div id="solicitud-detalle-section" class="box" style="display: none;">
         <div class="box-header">
@@ -439,6 +453,7 @@
   <script src="comentarios.js"></script>
   <script src="busqueda.js"></script>
   <script src="indicadores.js"></script>
+  <script src="exportacion.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

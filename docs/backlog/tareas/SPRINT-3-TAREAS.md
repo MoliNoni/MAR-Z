@@ -37,23 +37,25 @@ Responsable: Dev 3
 ## HU12 — Exportar reporte
 Responsable: Dev 4
 
-- [ ] Implementar exportación CSV.
-- [ ] Aplicar los filtros seleccionados.
-- [ ] Excluir credenciales.
-- [ ] Excluir texto libre innecesario.
-- [ ] Registrar cada exportación.
-- [ ] Probar contenido y filtros del CSV.
+- [x] Implementar exportación CSV.
+- [x] Aplicar los filtros seleccionados.
+- [x] Excluir credenciales.
+- [x] Excluir texto libre innecesario.
+- [x] Registrar cada exportación.
+- [x] Probar contenido y filtros del CSV.
 
 ## Cambio controlado del Sprint 3
 
 - [ ] Ajustar HU11 para el acceso de solo lectura del auditor.
-- [ ] Ajustar HU12 para excluir texto libre.
+- [x] Ajustar HU12 para excluir texto libre.
 - [ ] Ejecutar regresión de Sprint 1 y Sprint 2.
 
 Notas de avance Sprint 3 (HU09 y HU10):
 - HU09: Busqueda flexible por texto en titulo y descripcion (`filtrarSolicitudes` en `src/busqueda.js`). Filtros combinables por estado, prioridad y categoria. Aislamiento segun permisos: solicitante solo busca sus solicitudes, agentes sus asignadas, coordinadores y auditores todas.
 - HU10: Indicadores agregados del servicio (`calcularIndicadores`, `consultarIndicadores` en `src/indicadores.js`) calculando volumen por estado y tiempo mediano de ciclo en horas. Filtros por estado, prioridad y categoria. Ausencia estricta de rankings individuales o metricas por agente. Restringido al coordinador.
 - Regresion automatizada: 55/55 pruebas OK (`npm test`), incluyendo suites completas para HU09 y HU10.
+- HU12: `exportarReporte` en `src/exportacion.js`. Solo coordinador. CSV con lista blanca de columnas (id, categoria, estado, prioridad, fecha objetivo, fechas); sin titulo, descripcion, justificacion, nombres, emails ni contrasenas. Valores escapados y protegidos contra inyeccion de formulas. Usa los filtros de estado, prioridad y categoria. Cada exportacion se registra en `exportaciones` (seccion 8 de `supabase_setup.sql`); si el registro falla, no se entrega el CSV.
+- Regresion automatizada (2026-10-05): 60/60 pruebas OK (`npm test`). Seccion 8 ejecutada en Supabase y verificada: la exportacion se registra y el registro no se puede editar ni borrar. Se retiro `asignado_a` del CSV (no requerido por HU12).
 
 ## Trabajo conjunto
 

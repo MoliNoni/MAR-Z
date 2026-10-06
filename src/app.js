@@ -141,6 +141,12 @@ const btnLimpiarFiltros = document.getElementById('btn-limpiar-filtros');
 const busquedaConteo = document.getElementById('busqueda-conteo');
 const busquedaTbody = document.getElementById('busqueda-tbody');
 
+// Elementos DOM Exportar reporte (HU12)
+const exportarSection = document.getElementById('exportar-section');
+const exportarError = document.getElementById('exportar-error');
+const exportarSuccess = document.getElementById('exportar-success');
+const btnExportarCsv = document.getElementById('btn-exportar-csv');
+
 // Elementos DOM Indicadores (HU10)
 const indicadoresSection = document.getElementById('indicadores-section');
 const indFiltroEstado = document.getElementById('ind-filtro-estado');
@@ -200,6 +206,7 @@ logoutBtn.addEventListener('click', () => {
   if (bandejaAtencionSection) bandejaAtencionSection.style.display = 'none';
   if (busquedaSection) busquedaSection.style.display = 'none';
   if (indicadoresSection) indicadoresSection.style.display = 'none';
+  if (exportarSection) exportarSection.style.display = 'none';
   showLogin();
 });
 
@@ -297,6 +304,11 @@ function showDashboard(user) {
     } else {
       indicadoresSection.style.display = 'none';
     }
+  }
+
+  // Mostrar seccion HU12 (Exportar reporte) para el Coordinador
+  if (exportarSection) {
+    exportarSection.style.display = hasPermission(user.role, 'exportar_reporte') ? 'block' : 'none';
   }
 
   if (solicitudDetalleSection) {
@@ -972,3 +984,37 @@ if (btnCalcularIndicadores) {
 }
 
 
+
+// ==========================================================
+// HU12 — EXPORTAR REPORTE (Dev 4)
+// ==========================================================
+
+if (btnExportarCsv) {
+  btnExportarCsv.addEventListener('click', async () => {
+    exportarError.style.display = 'none';
+    exportarSuccess.style.display = 'none';
+
+    const filtros = {
+      estado: indFiltroEstado ? indFiltroEstado.value : '',
+      prioridad: indFiltroPrioridad ? indFiltroPrioridad.value : '',
+      categoria: indFiltroCategoria ? indFiltroCategoria.value : ''
+    };
+
+    const resultado = await exportarReporte(filtros, currentUser);
+    if (!resultado.success) {
+      exportarError.textContent = resultado.error;
+      exportarError.style.display = 'block';
+      return;
+    }
+
+    const url = URL.createObjectURL(new Blob([resultado.csv], { type: 'text/csv;charset=utf-8' }));
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = `reporte-marz-${new Date().toISOString().slice(0, 10)}.csv`;
+    enlace.click();
+    URL.revokeObjectURL(url);
+
+    exportarSuccess.textContent = `Reporte exportado (${resultado.cantidad} solicitudes).`;
+    exportarSuccess.style.display = 'block';
+  });
+}
