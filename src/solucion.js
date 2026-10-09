@@ -103,8 +103,11 @@ async function aplicarAccionSolucion(solicitudId, usuario, estadoNuevo, accion, 
       .insert([{
         solicitud_id: solicitudId,
         accion,
+        campo: 'estado',
         estado_anterior: ESTADOS_SOLUCION.RESUELTO,
         estado_nuevo: estadoNuevo,
+        valor_anterior: ESTADOS_SOLUCION.RESUELTO,
+        valor_nuevo: estadoNuevo,
         motivo: motivo || null,
         usuario_id: usuario.id,
         fecha: ahora

@@ -147,6 +147,11 @@ const exportarError = document.getElementById('exportar-error');
 const exportarSuccess = document.getElementById('exportar-success');
 const btnExportarCsv = document.getElementById('btn-exportar-csv');
 
+// Elementos DOM Historial de auditoria (HU11)
+const auditoriaSection = document.getElementById('auditoria-section');
+const auditoriaError = document.getElementById('auditoria-error');
+const auditoriaTbody = document.getElementById('auditoria-tbody');
+
 // Elementos DOM Indicadores (HU10)
 const indicadoresSection = document.getElementById('indicadores-section');
 const indFiltroEstado = document.getElementById('ind-filtro-estado');
@@ -311,9 +316,51 @@ function showDashboard(user) {
     exportarSection.style.display = hasPermission(user.role, 'exportar_reporte') ? 'block' : 'none';
   }
 
+  // Mostrar seccion HU11 (Historial de auditoria) solo para el auditor
+  if (auditoriaSection) {
+    if (hasPermission(user.role, 'historial_auditoria')) {
+      auditoriaSection.style.display = 'block';
+      renderHistorialAuditoria(user);
+    } else {
+      auditoriaSection.style.display = 'none';
+    }
+  }
+
   if (solicitudDetalleSection) {
     solicitudDetalleSection.style.display = 'none';
   }
+}
+
+// HU11: Renderizar historial estructurado, sin motivos ni texto libre.
+async function renderHistorialAuditoria(user) {
+  if (!auditoriaTbody) return;
+
+  auditoriaError.style.display = 'none';
+  auditoriaTbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--color-fg-muted);">Cargando historial...</td></tr>';
+  const resultado = await consultarHistorialAuditoria(user);
+
+  if (!resultado.success) {
+    auditoriaTbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--color-fg-muted);">No hay cambios registrados.</td></tr>';
+    auditoriaError.textContent = resultado.error;
+    auditoriaError.style.display = 'block';
+    return;
+  }
+
+  if (resultado.historial.length === 0) {
+    auditoriaTbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--color-fg-muted);">No hay cambios registrados.</td></tr>';
+    return;
+  }
+
+  auditoriaTbody.innerHTML = resultado.historial.map(registro => `
+    <tr>
+      <td>${escaparHtml(registro.solicitudId)}</td>
+      <td>${escaparHtml(registro.actor)}</td>
+      <td>${escaparHtml(new Date(registro.fecha).toLocaleString())}</td>
+      <td>${escaparHtml(registro.campo)}</td>
+      <td>${escaparHtml(registro.valorAnterior ?? '-')}</td>
+      <td>${escaparHtml(registro.valorNuevo ?? '-')}</td>
+    </tr>
+  `).join('');
 }
 
 // Manejo de Creacion de Solicitud (HU02)

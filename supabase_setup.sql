@@ -80,6 +80,10 @@ create table if not exists public.historial_solicitudes (
   fecha timestamptz not null default now()
 );
 
+alter table public.historial_solicitudes add column if not exists campo text;
+alter table public.historial_solicitudes add column if not exists valor_anterior text;
+alter table public.historial_solicitudes add column if not exists valor_nuevo text;
+
 alter table public.historial_solicitudes enable row level security;
 
 -- El historial solo admite lectura e insercion (no se edita ni se borra)

@@ -378,8 +378,11 @@ async function asignarSolicitud(solicitudId, agenteId, usuarioCoordinador) {
       await client.from('historial_solicitudes').insert([{
         solicitud_id: solicitudId,
         accion: 'Asignar solicitud',
+        campo: 'asignado_a',
         estado_anterior: solicitud.estado,
         estado_nuevo: solicitud.estado,
+        valor_anterior: solicitud.asignado_a || null,
+        valor_nuevo: agente.id,
         motivo: `Asignado a ${nombreAgente} por ${nombreCoordinador}`,
         usuario_id: usuarioCoordinador.id,
         fecha: ahora

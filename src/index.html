@@ -340,6 +340,34 @@
         </div>
       </div>
 
+      <!-- Seccion HU11: Historial de auditoria (Visible solo para Auditor) -->
+      <div id="auditoria-section" class="box" style="display: none;">
+        <div class="box-header">
+          <h2>HU11 — Historial de auditoria</h2>
+          <span class="badge-inmutable">Solo lectura</span>
+        </div>
+        <div class="box-body">
+          <div id="auditoria-error" class="alert-error" role="alert"></div>
+          <table class="table-simple" id="auditoria-tabla">
+            <thead>
+              <tr>
+                <th>Solicitud</th>
+                <th>Actor</th>
+                <th>Fecha</th>
+                <th>Campo</th>
+                <th>Valor anterior</th>
+                <th>Valor nuevo</th>
+              </tr>
+            </thead>
+            <tbody id="auditoria-tbody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--color-fg-muted);">No hay cambios registrados.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- Vista de Detalle de Solicitud (HU03) -->
       <div id="solicitud-detalle-section" class="box" style="display: none;">
         <div class="box-header">
@@ -454,6 +482,7 @@
   <script src="busqueda.js"></script>
   <script src="indicadores.js"></script>
   <script src="exportacion.js"></script>
+  <script src="auditoria.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

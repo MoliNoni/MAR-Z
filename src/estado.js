@@ -152,8 +152,11 @@ async function cambiarEstado(solicitudId, estadoNuevo, usuario, motivo) {
       .insert([{
         solicitud_id: solicitudId,
         accion: 'Cambiar estado',
+        campo: 'estado',
         estado_anterior: actual.estado,
         estado_nuevo: estadoNuevo,
+        valor_anterior: actual.estado,
+        valor_nuevo: estadoNuevo,
         motivo: motivo || null,
         usuario_id: usuario.id,
         fecha: ahora

@@ -26,13 +26,13 @@ Responsable: Dev 2
 ## HU11 — Historial de auditoría
 Responsable: Dev 3
 
-- [ ] Preparar consulta del historial.
-- [ ] Mostrar actor codificado.
-- [ ] Mostrar fecha y campo afectado.
-- [ ] Mostrar valor anterior y nuevo.
-- [ ] Restringir acceso al auditor.
-- [ ] Mantener el historial en modo lectura.
-- [ ] Probar permisos y trazabilidad.
+- [x] Preparar consulta del historial.
+- [x] Mostrar actor codificado.
+- [x] Mostrar fecha y campo afectado.
+- [x] Mostrar valor anterior y nuevo.
+- [x] Restringir acceso al auditor.
+- [x] Mantener el historial en modo lectura.
+- [x] Probar permisos y trazabilidad.
 
 ## HU12 — Exportar reporte
 Responsable: Dev 4
@@ -46,7 +46,7 @@ Responsable: Dev 4
 
 ## Cambio controlado del Sprint 3
 
-- [ ] Ajustar HU11 para el acceso de solo lectura del auditor.
+- [x] Ajustar HU11 para el acceso de solo lectura del auditor.
 - [x] Ajustar HU12 para excluir texto libre.
 - [ ] Ejecutar regresión de Sprint 1 y Sprint 2.
 
