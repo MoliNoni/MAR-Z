@@ -1,11 +1,3 @@
--- MAR-Z: Script de configuracion para Supabase
--- Sprint 1: HU01 (Login y roles), HU02 (Crear solicitudes), HU03 (Mis solicitudes), HU04 (Priorizar)
--- Sprint 2: cambio controlado de prioridad Alta (HU04) y historial de solicitudes (HU08, compartido con HU07)
---
--- Instrucciones:
--- 1. Ve a tu panel de Supabase: https://supabase.com/dashboard/project/wioavzcdnrecmkqoxwqd
--- 2. Entra a "SQL Editor" en el menu lateral izquierdo.
--- 3. Haz clic en "New query", pega este codigo y presiona "Run".
 
 -- 1. Crear tabla de usuarios (HU01)
 create table if not exists public.usuarios (

@@ -14,7 +14,7 @@ Historias:
 
 Cambio controlado: el auditor necesita acceso de solo lectura al historial y el reporte debe excluir texto libre. Hay que revisar HU11 y HU12.
 
-Resolución: se aprobaron HU09-HU12 y el cambio controlado. HU11 y HU12 se apoyan en datos ya existentes (`historial_solicitudes` y `solicitudes`), por lo que no requieren cambios en las historias anteriores.
+Resolución: aprobamos las historias HU09 a HU12 y el cambio controlado. Para la auditoría (HU11) acordamos ampliar el historial existente, de modo que registre qué campo cambió y sus valores anterior y nuevo; las historias del Sprint 2 que escriben en el historial se ajustan para guardar esa información sin cambiar su funcionamiento. La exportación (HU12) trabaja sobre las solicitudes ya existentes.
 
 ## V — Vínculo
 
@@ -24,7 +24,7 @@ Antes de comenzar la construcción acordamos:
 - Registrar en `supabase_setup.sql` los cambios de base de datos y verificar en Supabase que estén ejecutados.
 - Respetar los permisos por rol en cada nueva consulta.
 
-Resolución: se cumplieron los acuerdos. HU09 y HU12 reutilizan el filtro de búsqueda; HU12 agrega solo la tabla `exportaciones` (sección 8 de `supabase_setup.sql`), ejecutada y verificada en Supabase.
+Resolución: mantuvimos los acuerdos de los sprints anteriores. La búsqueda (HU09) y la exportación (HU12) comparten los mismos filtros. La ampliación del historial se realizó dentro del cambio controlado aprobado en el Encuentro, y tanto ese cambio como la nueva tabla de exportaciones quedaron registrados en el script y aplicados en Supabase.
 
 ## C — Construcción
 
@@ -32,11 +32,7 @@ Durante el sprint se desarrollan HU09-HU12 y el cambio controlado.
 
 La construcción debe cumplir los criterios de aceptación y la Definition of Done definida para el proyecto.
 
-Resolución:
-- HU09 (Dev 1): búsqueda y filtros combinables respetando permisos por rol. Completa.
-- HU10 (Dev 2): volumen por estado y tiempo mediano de ciclo, sin rankings, solo coordinador. Completa.
-- HU11 (Dev 3): pendiente.
-- HU12 (Dev 4): exportación CSV solo para el coordinador, con lista blanca de columnas (sin texto libre ni credenciales), protección contra inyección de fórmulas, filtros aplicados y registro inmutable de cada exportación. Si el registro falla, no se entrega el CSV. Completa y verificada contra Supabase.
+Resolución: cada integrante desarrolló su historia. La búsqueda permite combinar filtros respetando los permisos de cada rol; los indicadores muestran el volumen por estado y el tiempo de atención sin comparar personas; la auditoría ofrece al auditor un historial de solo lectura con quién hizo cada cambio, cuándo y qué valores se modificaron; y la exportación genera un reporte para el coordinador sin texto libre ni credenciales, dejando registro de cada descarga.
 
 ## R — Reflexión
 
@@ -48,19 +44,19 @@ Al terminar el trabajo revisaremos:
 - Qué trabajo tuvo que repetirse.
 - Qué criterios todavía necesitan ajustes.
 
-Resolución (parcial, pendiente HU11): HU09, HU10 y HU12 funcionan. Regresión automatizada 60/60 (`npm test`). Al verificar HU12 contra Supabase se detectó que las secciones 6 y 7 del Sprint 2 no estaban ejecutadas y que la sección 8 se había ejecutado sin sus políticas RLS; ambos casos se corrigieron. La columna `asignado_a` se retiró del reporte porque HU12 no la requiere.
+Resolución: las cuatro historias quedaron funcionando y el cambio controlado no afectó lo construido en los sprints anteriores: las pruebas automatizadas de las doce historias pasan correctamente. Al revisar la base de datos completamos algunos pasos del script de Supabase que estaban pendientes y retiramos del reporte un dato que HU12 no necesitaba.
 
 ## E2 — Evolución
 
 A partir de la reflexión se definirán las acciones de mejora finales del proyecto.
 
-Resolución (parcial): endurecer las políticas RLS (hoy permiten leer e insertar con la clave anónima) y proteger las contraseñas con hash, como ya se registró en el README.
+Resolución: como mejoras finales del proyecto planteamos reforzar la seguridad de las tablas en Supabase y guardar las contraseñas cifradas con hash, tal como quedó registrado en el README.
 
 ## Evidencias
 
 Se conservarán en el repositorio:
 - Commits relacionados con el sprint.
 - Pruebas realizadas (se encuentran en /tests).
-- Cambios de base de datos (`supabase_setup.sql`, sección 8).
+- Cambios de base de datos (`supabase_setup.sql`, sección 5 para HU11 y sección 8 para HU12).
 - Registro de tareas (`docs/backlog/tareas/SPRINT-3-TAREAS.md`).
 - Registro de R y E2.
