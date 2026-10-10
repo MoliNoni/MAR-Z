@@ -423,6 +423,21 @@ async function cambiarPrioridad(solicitudId, prioridad, usuario, detalle) {
   const ahora = new Date().toISOString();
 
   try {
+    // HU11: leer el valor anterior para registrarlo en el historial
+    const { data: actual, error: errorActual } = await client
+      .from('solicitudes')
+      .select('estado, prioridad, prioridad_justificacion, prioridad_fecha_objetivo, prioridad_actualizada_por, prioridad_actualizada_en, ultima_actualizacion')
+      .eq('id', solicitudId)
+      .maybeSingle();
+
+    if (errorActual) {
+      return { success: false, error: errorActual.message };
+    }
+
+    if (!actual) {
+      return { success: false, error: 'Solicitud no encontrada.' };
+    }
+
     const { data, error } = await client
       .from('solicitudes')
       .update({
@@ -444,6 +459,37 @@ async function cambiarPrioridad(solicitudId, prioridad, usuario, detalle) {
 
     if (!data) {
       return { success: false, error: 'Solicitud no encontrada.' };
+    }
+
+    const { error: errorHistorial } = await client
+      .from('historial_solicitudes')
+      .insert([{
+        solicitud_id: solicitudId,
+        accion: 'Cambiar prioridad',
+        campo: 'prioridad',
+        estado_anterior: actual.estado,
+        estado_nuevo: actual.estado,
+        valor_anterior: actual.prioridad || null,
+        valor_nuevo: prioridad,
+        motivo: esAlta ? detalle.justificacion.trim() : null,
+        usuario_id: usuario.id,
+        fecha: ahora
+      }]);
+
+    if (errorHistorial) {
+      // Sin registro en el historial no se acepta el cambio
+      await client
+        .from('solicitudes')
+        .update({
+          prioridad: actual.prioridad,
+          prioridad_justificacion: actual.prioridad_justificacion,
+          prioridad_fecha_objetivo: actual.prioridad_fecha_objetivo,
+          prioridad_actualizada_por: actual.prioridad_actualizada_por,
+          prioridad_actualizada_en: actual.prioridad_actualizada_en,
+          ultima_actualizacion: actual.ultima_actualizacion
+        })
+        .eq('id', solicitudId);
+      return { success: false, error: 'No se pudo registrar el cambio en el historial.' };
     }
 
     return {

@@ -8,6 +8,7 @@ const {
   validarDetallePrioridad,
   cambiarPrioridad
 } = require('../src/requests.js');
+const { consultarHistorialAuditoria } = require('../src/auditoria.js');
 
 const solicitante = { id: 'USR-01', name: 'Carlos Solicitante', email: 'solicitante@marz.com', role: 'solicitante' };
 const coordinador = { id: 'USR-02', name: 'Ana Coordinadora', email: 'coordinador@marz.com', role: 'coordinador' };
@@ -57,6 +58,13 @@ test('HU04 — Cambiar prioridad en Supabase registrando quien y cuando', async 
   assert.strictEqual(res.solicitud.prioridadJustificacion, 'Afecta a toda el area');
   assert.strictEqual(res.solicitud.prioridadFechaObjetivo, '2099-12-31');
   assert.ok(!isNaN(Date.parse(res.solicitud.prioridadActualizadaEn)));
+
+  const auditoria = await consultarHistorialAuditoria({ id: 'USR-AUD', role: 'auditor' });
+  assert.strictEqual(auditoria.success, true, auditoria.error);
+  const registro = auditoria.historial.find(h => h.solicitudId === sol.id && h.campo === 'prioridad');
+  assert.ok(registro, 'El cambio de prioridad debe quedar en el historial');
+  assert.strictEqual(registro.valorNuevo, 'Alta');
+  assert.strictEqual(registro.actor, coordinador.id);
 
   const consulta = await consultarSolicitudesParaPriorizar(coordinador);
   assert.strictEqual(consulta.success, true);

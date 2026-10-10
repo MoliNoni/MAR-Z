@@ -56,7 +56,7 @@ Notas de avance Sprint 3 (HU09 y HU10):
 - Regresion automatizada: 55/55 pruebas OK (`npm test`), incluyendo suites completas para HU09 y HU10.
 - HU12: `exportarReporte` en `src/exportacion.js`. Solo coordinador. CSV con lista blanca de columnas (id, categoria, estado, prioridad, fecha objetivo, fechas); sin titulo, descripcion, justificacion, nombres, emails ni contrasenas. Valores escapados y protegidos contra inyeccion de formulas. Usa los filtros de estado, prioridad y categoria. Cada exportacion se registra en `exportaciones` (seccion 8 de `supabase_setup.sql`); si el registro falla, no se entrega el CSV.
 - Regresion automatizada (2026-10-05): 60/60 pruebas OK (`npm test`). Seccion 8 ejecutada en Supabase y verificada: la exportacion se registra y el registro no se puede editar ni borrar. Se retiro `asignado_a` del CSV (no requerido por HU12).
-- HU11: `consultarHistorialAuditoria` en `src/auditoria.js`. Solo auditor, en modo lectura. Muestra actor codificado, fecha, campo afectado, valor anterior y nuevo, sin texto libre (`motivo`). `historial_solicitudes` se amplio con `campo`, `valor_anterior` y `valor_nuevo` (seccion 5 de `supabase_setup.sql`), ejecutadas y verificadas en Supabase; HU05, HU07 y HU08 registran esos datos.
+- HU11: `consultarHistorialAuditoria` en `src/auditoria.js`. Solo auditor, en modo lectura. Muestra actor codificado, fecha, campo afectado, valor anterior y nuevo, sin texto libre (`motivo`). `historial_solicitudes` se amplio con `campo`, `valor_anterior` y `valor_nuevo` (seccion 5 de `supabase_setup.sql`), ejecutadas y verificadas en Supabase; HU04, HU05, HU07 y HU08 registran esos datos.
 - Regresion automatizada completa (2026-10-10): 62/62 pruebas OK (`npm test`), Sprint 1 18/18, Sprint 2 24/24, Sprint 3 20/20.
 
 ## Trabajo conjunto
@@ -64,7 +64,7 @@ Notas de avance Sprint 3 (HU09 y HU10):
 - [x] Integrar HU09-HU12.
 - [x] Ejecutar regresión completa.
 - [x] Revisar las 12 historias.
-- [ ] Revisar criterios de aceptación.
+- [x] Revisar criterios de aceptación.
 - [x] Registrar defectos y retrabajo.
 - [x] Preparar evidencias finales de R y E2.
-- [ ] Verificar Definition of Done.
+- [x] Verificar Definition of Done.
